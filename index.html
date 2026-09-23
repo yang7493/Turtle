@@ -114,6 +114,9 @@
   .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: 22px; }
   .card-title { margin: 0; font-size: 1.02rem; font-weight: 700; letter-spacing: -.015em; }
   .section + .section { margin-top: 26px; }
+  /* 대시보드 안의 기록 영역: 얇은 구분선으로 이어 붙임 */
+  .dash-block { margin-top: 22px; padding-top: 20px; box-shadow: 0 -1px 0 var(--line); }
+  .dash-block + .dash-block { margin-top: 22px; }
   .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; min-height: 28px; }
 
   /* ---------- 카메라 모니터링 영역 ---------- */
@@ -287,7 +290,7 @@
   @media (max-width: 980px) {
     .grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
     .col { display: contents; }
-    .stage { order: 1; } .hint { order: 2; } .dash { order: 3; } .records { order: 4; }
+    .stage { order: 1; } .hint { order: 2; } .dash { order: 3; }
     .hint:empty { display: none; }
   }
   @media (max-width: 560px) {
@@ -480,28 +483,6 @@
         </div>
       </div>
       <p class="hint" id="hint" aria-live="polite"></p>
-
-      <section class="card records">
-        <div class="section timeline">
-          <div class="section-head"><h2 class="card-title">자세 기록</h2></div>
-          <canvas id="tl"></canvas>
-          <div class="legend">
-            <span style="--c: var(--moss)">바른 목</span>
-            <span style="--c: var(--amber)">슬슬 거북</span>
-            <span style="--c: var(--signal)">거북목</span>
-            <span style="--c: var(--idle)">인식 안 됨</span>
-          </div>
-        </div>
-
-        <div class="section history">
-          <div class="section-head">
-            <h2 class="card-title">저장된 기록</h2>
-            <button class="btn btn-text" id="btnClearHistory" hidden>모두 지우기</button>
-          </div>
-          <ol id="history"></ol>
-          <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
-        </div>
-      </section>
     </div>
 
     <aside class="col">
@@ -567,6 +548,26 @@
             <span class="menu-label">다른 창에서 일할 때도 알림</span>
             <input type="checkbox" class="switch" id="notifyOn">
           </label>
+        </div>
+
+        <div class="section dash-block timeline">
+          <div class="section-head"><h2 class="card-title">자세 기록</h2></div>
+          <canvas id="tl"></canvas>
+          <div class="legend">
+            <span style="--c: var(--moss)">바른 목</span>
+            <span style="--c: var(--amber)">슬슬 거북</span>
+            <span style="--c: var(--signal)">거북목</span>
+            <span style="--c: var(--idle)">인식 안 됨</span>
+          </div>
+        </div>
+
+        <div class="section dash-block history">
+          <div class="section-head">
+            <h2 class="card-title">저장된 기록</h2>
+            <button class="btn btn-text" id="btnClearHistory" hidden>모두 지우기</button>
+          </div>
+          <ol id="history"></ol>
+          <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
         </div>
       </section>
     </aside>
