@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>거북목 경고등</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>🐢 거북목 경고등</h1>
+      <p class="subtitle">웹캠으로 자세를 인식해서 목이 앞으로 빠지면 화면이 빨개집니다</p>
+    </header>
+
+    <div id="stage">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div id="warningLayer">
+        <div id="warningText">🐢 거북목 감지!</div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <button id="startBtn">시작하기</button>
+      <button id="calibrateBtn" disabled>바른 자세로 보정하기</button>
+      <label class="sensitivity">
+        민감도
+        <input type="range" id="sensitivity" min="5" max="40" value="15" />
+      </label>
+    </div>
+
+    <div id="status">
+      <span id="statusDot" class="dot"></span>
+      <span id="statusLabel">대기 중</span>
+    </div>
+
+    <div id="statsPanel">
+      <div class="stat">
+        <div class="stat-label">오늘의 거북이 지수</div>
+        <div class="stat-value" id="todayCount">0</div>
+        <div class="stat-unit">회 감지</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">오늘 거북목 유지 시간</div>
+        <div class="stat-value" id="todaySeconds">0</div>
+        <div class="stat-unit">초</div>
+      </div>
+      <button id="resetBtn">오늘 기록 초기화</button>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
