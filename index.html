@@ -253,10 +253,13 @@
 
   .history ol { list-style: none; margin: 0 -8px; padding: 0; max-height: 360px; overflow-y: auto; }
   .item {
-    display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+    display: grid; grid-template-columns: 44px minmax(0, 1fr) auto auto; align-items: center; gap: 14px;
     padding: 10px 8px; border-radius: 10px; transition: background-color var(--ease);
   }
   .item:hover { background: var(--surface-2); }
+  .item-del { width: 32px; height: 32px; margin-left: -6px; color: var(--faint); }
+  .item-del:hover { color: var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); }
+  .item-del svg { width: 17px; height: 17px; }
   .item-bar { grid-column: 2 / -1; height: 8px; margin-top: -4px; background: var(--surface-3); }
   .item-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); font-size: 1.3rem; }
   .item:hover .item-icon { background: var(--surface); }
@@ -1159,6 +1162,13 @@ function saveRecord(rec) {
   hint("결과를 저장했어요.");
   renderHistory();
 }
+// 기록 하나 지우기 (저장 시각 at 으로 구분)
+function deleteRecord(at) {
+  if (!confirm("이 기록을 지울까요?")) return;
+  const list = loadHistory().filter((r) => r.at !== at);
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch {}
+  renderHistory();
+}
 function renderHistory() {
   const list = loadHistory();
   const ol = $("#history");
@@ -1172,7 +1182,13 @@ function renderHistory() {
     main.append(el("p", "item-title", `${r.name || "거북이 지수"} · ${r.idx}`), sub);
     const badge = el("span", "badge" + (r.alarms === 0 ? " good" : r.alarms >= 5 ? " hot" : ""), `경고 ${r.alarms}번`);
     const li = el("li", "item");
-    li.append(el("span", "item-icon", r.emoji), main, badge);
+    const del = el("button", "icon-btn item-del");
+    del.type = "button";
+    del.setAttribute("aria-label", "이 기록 삭제");
+    del.title = "삭제";
+    del.innerHTML = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h12M8 6V4.5h4V6M6 6l.7 9.5h6.6L14 6"/></svg>`;
+    del.addEventListener("click", () => deleteRecord(r.at));
+    li.append(el("span", "item-icon", r.emoji), main, badge, del);
     if (r.tl) {
       const bar = el("div", "item-bar");
       bar.style.background = ticksGradient(r.tl);
