@@ -695,10 +695,20 @@ let stats = freshStats();
 // 워커의 타이머로 분석 루프를 계속 돌린다.
 const ticker = new Worker(URL.createObjectURL(new Blob(
   ["setInterval(() => postMessage(0), 250);"], { type: "text/javascript" })));
-ticker.onmessage = () => {
-  if (!running || !document.hidden || (pipWin && !pipWin.closed) || !bgRun) return;
+let lastLoopAt = 0;
+function kickLoop() {
+  if (!running || !bgRun) return;
   const run = bgRun; bgRun = null; run();
+}
+ticker.onmessage = () => {
+  if (!running || !bgRun) return;
+  const background = document.hidden && !(pipWin && !pipWin.closed);
+  // 안전장치: 탭 전환 · 작은 창 닫힘 등으로 화면 갱신 예약이 끊겨 루프가 멈췄으면 다시 깨움
+  const stalled = performance.now() - lastLoopAt > 400;
+  if (background || stalled) kickLoop();
 };
+// 가려져 있던 탭이 다시 보이면 바로 화면 갱신 루프로 복귀 (가려진 동안엔 예약된 화면 갱신이 없음)
+document.addEventListener("visibilitychange", () => { if (!document.hidden) kickLoop(); });
 
 function freshStats() {
   return { ticks: [], good: 0, warn: 0, bad: 0, alarms: 0, streak: 0, best: 0 };
@@ -848,11 +858,16 @@ function schedule() {
 }
 function loop() {
   if (!running) return;
-  if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
-    lastVideoTime = video.currentTime;
-    const now = performance.now();
-    const res = landmarker.detectForVideo(video, now);
-    handle(res, now);
+  lastLoopAt = performance.now();
+  try {
+    if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+      lastVideoTime = video.currentTime;
+      const now = performance.now();
+      const res = landmarker.detectForVideo(video, now);
+      handle(res, now);
+    }
+  } catch (e) {
+    console.error(e); // 한 프레임 실패로 루프 전체가 멈추지 않게
   }
   schedule();
 }
