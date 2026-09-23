@@ -756,17 +756,24 @@ function drawTimeline() {
 window.addEventListener("resize", drawTimeline);
 
 // ---------- report ----------
+// 거북이 지수 등급: [이 값 미만까지, 이모지, 등급 이름, 한마디]
+const GRADES = [
+  [10, "🧍", "완벽한 사람", "거의 흐트러짐이 없었어요. 이 자세 그대로 유지하세요."],
+  [20, "🙆", "거의 사람", "가끔 고개가 나왔지만 금방 돌아왔어요. 아주 좋아요."],
+  [30, "🙇", "살짝 거북", "고개가 슬슬 나오기 시작해요. 한 시간에 한 번은 기지개를 켜세요."],
+  [45, "🐢", "반쯤 거북", "거북목 시간이 꽤 길어요. 모니터를 눈높이까지 올려보세요."],
+  [60, "🐢💦", "거의 거북", "절반 가까이 거북 자세였어요. 의자 높이와 모니터 거리를 다시 맞춰보세요."],
+  [Infinity, "🐢🚨", "완전 거북", "대부분 거북 자세였어요. 30분마다 일어나서 목과 어깨를 풀어주세요."],
+];
 function showReport() {
   const counted = stats.good + stats.warn + stats.bad;
   const idx = counted ? Math.round(((stats.bad + stats.warn * 0.5) / counted) * 100) : 0;
-  const [emoji, label] = idx < 15 ? ["🧍", "아직 사람이에요. 이 자세 그대로 유지하세요."]
-    : idx < 35 ? ["🙇", "반쯤 거북이에요. 한 시간에 한 번은 기지개를 켜세요."]
-    : ["🐢", "완전 거북이에요. 모니터를 눈높이까지 올려보세요."];
+  const [, emoji, name, label] = GRADES.find(([max]) => idx < max);
   $("#rGrade").textContent = `${emoji} ${idx}`;
-  $("#rLabel").textContent = label;
+  $("#rLabel").textContent = `${name} · ${label}`;
   $("#rDetail").textContent = `측정 ${fmt(stats.ticks.length)} 동안 경고 ${stats.alarms}번, 최장 연속 바른 자세 ${fmt(stats.best)}.`;
   pendingRecord = stats.ticks.length ? {
-    at: Date.now(), secs: stats.ticks.length, idx, emoji, alarms: stats.alarms, best: stats.best,
+    at: Date.now(), secs: stats.ticks.length, idx, emoji, name, alarms: stats.alarms, best: stats.best,
     good: counted ? Math.round((stats.good / counted) * 100) : null,
   } : null;
   $("#report").showModal();
@@ -794,7 +801,7 @@ function renderHistory() {
     const when = `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
     const li = document.createElement("li");
     const b = document.createElement("b");
-    b.textContent = `${r.emoji} ${r.idx}`;
+    b.textContent = `${r.emoji} ${r.idx}${r.name ? " " + r.name : ""}`;
     const span = document.createElement("span");
     span.textContent = `${when} · ${fmt(r.secs)} 측정 · 바른 자세 ${r.good == null ? "–" : r.good + "%"} · 경고 ${r.alarms}번`;
     li.append(b, span);
