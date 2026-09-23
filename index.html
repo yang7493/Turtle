@@ -263,6 +263,8 @@
   .item-bar { grid-column: 2 / -1; height: 8px; margin-top: -4px; background: var(--surface-3); }
   .item-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); font-size: 1.3rem; }
   .item:hover .item-icon { background: var(--surface); }
+  .item-icon { overflow: hidden; white-space: nowrap; line-height: 1; }
+  .item-icon.multi { font-size: .9rem; letter-spacing: -.08em; }
   .item-title { margin: 0; font-size: .94rem; font-weight: 600; letter-spacing: -.01em; }
   .item-sub { margin: 2px 0 0; font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .item-hl { color: var(--primary-ink); font-weight: 600; }
@@ -1220,7 +1222,11 @@ function renderHistory() {
     del.title = "삭제";
     del.innerHTML = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h12M8 6V4.5h4V6M6 6l.7 9.5h6.6L14 6"/></svg>`;
     del.addEventListener("click", () => deleteRecord(r.at));
-    li.append(el("span", "item-icon", r.emoji), main, badge, del);
+    const icon = el("span", "item-icon", r.emoji);
+    // 🐢💦 처럼 이모지가 여러 개면 칸 안에 들어가도록 작게
+    const glyphs = "Segmenter" in Intl ? [...new Intl.Segmenter().segment(r.emoji)].length : [...r.emoji].length;
+    if (glyphs > 1) icon.classList.add("multi");
+    li.append(icon, main, badge, del);
     if (r.tl) {
       const bar = el("div", "item-bar");
       bar.style.background = ticksGradient(r.tl);
