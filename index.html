@@ -28,11 +28,11 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --shell: #12211A; --paper: #1A2D24; --ink: #E4EEDD; --muted: #9DB5A7; --line: #2D463A; --idle: #5E7569;
+      --shell: #22382D; --paper: #2F4B3D; --ink: #EEF5EA; --muted: #BCD0C2; --line: #46634F; --idle: #86A092;
     }
   }
   :root[data-theme="dark"] {
-    --shell: #12211A; --paper: #1A2D24; --ink: #E4EEDD; --muted: #9DB5A7; --line: #2D463A; --idle: #5E7569;
+    --shell: #22382D; --paper: #2F4B3D; --ink: #EEF5EA; --muted: #BCD0C2; --line: #46634F; --idle: #86A092;
   }
   *, *::before, *::after { box-sizing: inherit; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
@@ -55,13 +55,13 @@
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
 
   .stage {
-    position: relative; aspect-ratio: 4 / 3; background: #0E1A14; border-radius: 22px; overflow: hidden;
+    position: relative; aspect-ratio: 4 / 3; background: #1B2D23; border-radius: 22px; overflow: hidden;
     outline: 6px solid var(--state); outline-offset: -6px; transition: outline-color .2s;
   }
   .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
   .stage-msg {
     position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 14px; padding: 24px; text-align: center; color: #EAF3E6; background: rgba(14, 26, 20, .72);
+    gap: 14px; padding: 24px; text-align: center; color: #EAF3E6; background: rgba(27, 45, 35, .6);
   }
   .stage-msg[hidden] { display: none; }
   .stage-msg .big { font-size: clamp(3rem, 12vw, 6rem); line-height: 1; }
@@ -824,7 +824,7 @@ async function openMini() {
   st.textContent = `
     body { margin: 0; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
     .mini-cam { width: 100%; aspect-ratio: 4/3; object-fit: cover; transform: scaleX(-1); border-radius: 14px;
-      background: #0E1A14; outline: 4px solid var(--state); outline-offset: -4px; }
+      background: #1B2D23; outline: 4px solid var(--state); outline-offset: -4px; }
     .mini-row { display: flex; align-items: center; gap: 12px; }
     .mini-row .lamp { width: 64px; height: 64px; font-size: 1.9rem; box-shadow: 0 0 0 5px color-mix(in srgb, var(--state) 25%, transparent); }
     #mWord { font-size: 1.5rem; line-height: 1.1; margin: 0; }
