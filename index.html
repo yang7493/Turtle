@@ -289,6 +289,20 @@
   dialog .row .btn { flex: 1; min-height: 46px; }
   #askSave h2 { font-size: 1.2rem; }
 
+  /* 등급 안내 창 */
+  #guideDlg { width: min(520px, calc(100vw - 32px)); }
+  .guide-lead { margin: 8px 0 0 !important; color: var(--muted); font-size: .9rem; }
+  .guide-list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .guide-list li { display: grid; grid-template-columns: 56px 58px minmax(0, 1fr); align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+  .guide-emoji { font-size: 1.25rem; letter-spacing: -.12em; text-align: center; white-space: nowrap; }
+  .guide-range { font-size: .8rem; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .guide-name { margin: 0 !important; font-size: .92rem; font-weight: 700; }
+  .guide-msg { margin: 1px 0 0 !important; font-size: .82rem; color: var(--muted); line-height: 1.45; }
+  .guide-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; }
+  .guide-foot .btn { min-width: 120px; min-height: 44px; }
+  .guide-check { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--ink-2); cursor: pointer; }
+  .guide-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--primary); cursor: pointer; }
+
   /* 저장된 기록 창 */
   #historyDlg { width: min(560px, calc(100vw - 32px)); max-height: min(80vh, 720px); padding: 24px 24px 20px; }
   #historyDlg[open] { display: flex; flex-direction: column; }
@@ -627,6 +641,16 @@
   </div>
   <ol id="history"></ol>
   <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
+</dialog>
+
+<dialog id="guideDlg">
+  <h2 class="display">거북이 지수 등급 안내</h2>
+  <p class="guide-lead">측정을 끝내면 거북목 자세였던 시간의 비율로 거북이 지수(0~100)를 알려드려요. 낮을수록 좋아요.</p>
+  <ol class="guide-list" id="guideList"></ol>
+  <div class="guide-foot">
+    <label class="guide-check"><input type="checkbox" id="guideHide"> 다시 보지 않기</label>
+    <button class="btn btn-primary" id="btnGuideOk" autofocus>확인</button>
+  </div>
 </dialog>
 
 <dialog id="askSave">
@@ -1129,6 +1153,33 @@ function runAfterReport() {
   const next = afterReport; afterReport = null;
   if (next) next();
 }
+// ---------- 거북이 지수 등급 안내 (홈에서 들어올 때, 다시 보지 않기 전까지) ----------
+const GUIDE_KEY = "turtle-hide-guide";
+function showGuide() {
+  try { if (localStorage.getItem(GUIDE_KEY) === "1") return; } catch {}
+  const list = $("#guideList");
+  if (!list.children.length) {
+    let min = 0;
+    GRADES.forEach(([max, emoji, name, msg]) => {
+      const range = max === Infinity ? `${min} 이상` : `${min}~${max - 1}`;
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="guide-emoji"></span><span class="guide-range"></span><div><p class="guide-name"></p><p class="guide-msg"></p></div>`;
+      li.querySelector(".guide-emoji").textContent = emoji;
+      li.querySelector(".guide-range").textContent = range;
+      li.querySelector(".guide-name").textContent = name;
+      li.querySelector(".guide-msg").textContent = msg;
+      list.appendChild(li);
+      min = max;
+    });
+  }
+  $("#guideHide").checked = false;
+  $("#guideDlg").showModal();
+}
+$("#btnGuideOk").addEventListener("click", () => $("#guideDlg").close());
+$("#guideDlg").addEventListener("close", () => { // 확인 · Esc 모두 여기서 처리
+  if ($("#guideHide").checked) { try { localStorage.setItem(GUIDE_KEY, "1"); } catch {} }
+  $("#btnStart").focus();
+});
 $("#btnHistory").addEventListener("click", () => $("#historyDlg").showModal());
 $("#btnHistoryClose").addEventListener("click", () => $("#historyDlg").close());
 $("#historyDlg").addEventListener("click", (e) => { // 창 바깥(배경)을 누르면 닫기
@@ -1199,6 +1250,7 @@ async function openMini() {
 
 $("#btnHome").addEventListener("click", () => {
   document.body.classList.remove("at-home");
+  showGuide();
   window.scrollTo(0, 0);
   $("#btnStart").focus();
 });
