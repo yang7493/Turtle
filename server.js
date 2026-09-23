@@ -4,7 +4,13 @@ const path = require("path");
 
 const PORT = process.env.PORT || 5174;
 const ROOT = __dirname;
-const TYPES = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript" };
+const TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css",
+  ".js": "text/javascript",
+  ".svg": "image/svg+xml",
+  ".webmanifest": "application/manifest+json",
+};
 
 http
   .createServer((req, res) => {

@@ -1,0 +1,9 @@
+{
+  "name": "거북목 경고등",
+  "short_name": "거북목",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#E4EEDD",
+  "theme_color": "#3F8A57",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

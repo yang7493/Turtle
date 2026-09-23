@@ -4,10 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>거북목 경고등</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3F8A57">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐢</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gothic+A1:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gothic+A1:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --shell: #E4EEDD;
@@ -123,9 +125,115 @@
   dialog .grade { font-size: 4rem; line-height: 1; margin: 14px 0 4px; }
   dialog p { margin: 6px 0; }
   dialog .row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+
+  /* ---------- 홈 화면 ---------- */
+  .home {
+    --h-bg: #0C1013; --h-ink: #E8EEF0; --h-muted: #8A969C; --h-dim: #4D585E;
+    --h-line: #243036; --h-chip: #141B20; --h-mint: #6FD3A8; --h-mint-ink: #0B1A13; --h-amber: #F0A04B;
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+    position: fixed; inset: 0; z-index: 10; overflow-y: auto; color-scheme: dark;
+    display: flex; flex-direction: column; align-items: center; justify-content: safe center;
+    padding: 20px 16px; text-align: center; color: var(--h-ink);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(111, 211, 168, .07), transparent 60%),
+      linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 44px 44px,
+      linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px) 0 0 / 44px 44px,
+      var(--h-bg);
+  }
+  body:not(.at-home) .home { display: none; }
+  body.at-home { background: #0C1013; }
+  body.at-home > .wrap, body.at-home > .banner { display: none; }
+
+  .home .tag {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
+    border: 1px solid var(--h-line); background: rgba(20, 27, 32, .8);
+    font: 700 .72rem/1 var(--mono); letter-spacing: .14em; color: var(--h-mint);
+  }
+  .home .tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--h-mint); box-shadow: 0 0 8px var(--h-mint); animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+
+  .home .figure { position: relative; width: 176px; height: 176px; margin: 16px 0 4px; }
+  .home .figure svg { width: 100%; height: 100%; overflow: visible; }
+  .home .figure .ring { fill: none; stroke: var(--h-line); }
+  .home .figure .person { transform-origin: 88px 150px; animation: slump 6s ease-in-out infinite; }
+  .home .state {
+    position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
+    padding: 3px 8px; border: 1px solid var(--h-line); background: var(--h-chip);
+    font: 700 .62rem/1 var(--mono); letter-spacing: .12em; color: var(--h-mint);
+  }
+  .home .state b { font-weight: inherit; animation: good 6s step-end infinite; }
+  .home .state b + b { position: absolute; inset: 3px 0; color: var(--h-amber); animation-name: bad; }
+  @keyframes good { 0% { opacity: 1; } 67% { opacity: 0; } 88% { opacity: 1; } }
+  @keyframes bad { 0% { opacity: 0; } 67% { opacity: 1; } 88% { opacity: 0; } }
+  /* 가끔 고개가 앞으로 빠졌다가 돌아오는 모습 */
+  @keyframes slump { 0%, 55%, 100% { transform: none; } 70%, 85% { transform: translateX(6px) rotate(9deg); } }
+
+  .home h1 { margin: 16px 0 0; font-size: clamp(1.7rem, 5vw, 2.1rem); line-height: 1.15; font-weight: 800; letter-spacing: -.01em; }
+  .home .sub { margin: 10px 0 0; font: 500 .72rem/1 var(--mono); letter-spacing: .22em; color: var(--h-dim); }
+  .home .lead { margin: 22px 0 0; color: var(--h-muted); line-height: 1.75; font-size: .98rem; }
+
+  .home .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 28px; }
+  .home .chips span {
+    display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px;
+    border: 1px solid var(--h-line); background: var(--h-chip); color: var(--h-muted);
+    font-size: .82rem; letter-spacing: .08em;
+  }
+  .home .chips svg { width: 13px; height: 13px; }
+
+  .home .go {
+    margin-top: 30px; width: min(236px, 100%); padding: 14px 20px; border: none; border-radius: 3px;
+    background: var(--h-mint); color: var(--h-mint-ink); font: 800 1rem/1 "Gothic A1", sans-serif; letter-spacing: .2em;
+    box-shadow: 0 0 28px rgba(111, 211, 168, .25); transition: transform .15s, box-shadow .15s;
+  }
+  .home .go:hover { transform: translateY(-1px); box-shadow: 0 0 38px rgba(111, 211, 168, .4); }
+  .home .go:focus-visible { outline: 2px solid var(--h-ink); outline-offset: 3px; }
+  .home .go span { margin-right: 10px; font-size: .8em; }
+  .home .need { margin: 14px 0 0; font-size: .74rem; letter-spacing: .12em; color: var(--h-dim); }
+  .home .ver { margin-top: 40px; font: 500 .7rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
+  @media (prefers-reduced-motion: reduce) { .home .person, .home .tag i, .home .state b { animation: none; } .home .state b + b { display: none; } }
 </style>
 </head>
-<body>
+<body class="at-home">
+<main class="home" id="home">
+  <div class="tag"><i></i>POSTURE MONITOR</div>
+
+  <div class="figure" aria-hidden="true">
+    <svg viewBox="0 0 176 176">
+      <circle class="ring" cx="88" cy="88" r="87" stroke-opacity=".6"/>
+      <circle class="ring" cx="88" cy="88" r="66"/>
+      <!-- 모니터 -->
+      <rect x="54" y="30" width="68" height="46" rx="3" fill="#1A2329" stroke="#3A4850" stroke-width="2"/>
+      <rect x="59" y="35" width="58" height="36" fill="#223038"/>
+      <line x1="88" y1="76" x2="88" y2="82" stroke="#3A4850" stroke-width="2"/>
+      <line x1="78" y1="83" x2="98" y2="83" stroke="#3A4850" stroke-width="2"/>
+      <!-- 사람 -->
+      <g fill="none" stroke="#6FD3A8" stroke-width="2" stroke-linecap="round">
+        <g class="person">
+          <circle cx="88" cy="97" r="7"/>
+          <line x1="88" y1="104" x2="88" y2="120"/>
+          <path d="M78 112 L88 107 L98 112"/>
+        </g>
+        <path d="M88 120 L81 134 M88 120 L95 134"/>
+      </g>
+    </svg>
+    <div class="state"><b>GOOD</b><b>TURTLE</b></div>
+  </div>
+
+  <h1>거북목 감지기</h1>
+  <p class="sub">FORWARD HEAD POSTURE MONITOR</p>
+  <p class="lead">컴퓨터 사용 중 나쁜 자세를 실시간으로 감지하고<br>즉시 알림으로 교정을 도와드립니다.</p>
+
+  <div class="chips">
+    <span><svg viewBox="0 0 14 14" fill="none" stroke="#6FD3A8" stroke-width="1.6"><circle cx="7" cy="7" r="5.5"/><circle cx="7" cy="7" r="2.2" fill="#6FD3A8" stroke="none"/></svg>실시간 감지</span>
+    <span><svg viewBox="0 0 14 14" fill="#F0A04B"><path d="M8 1 L3 8 H6.5 L5.5 13 L11 5.5 H7.5 Z"/></svg>즉시 알림</span>
+    <span><svg viewBox="0 0 14 14" fill="none" stroke="#6FD3A8" stroke-width="1.6"><circle cx="7" cy="7" r="5.5"/><circle cx="7" cy="7" r="2.5"/></svg>교정 가이드</span>
+  </div>
+
+  <button class="go" id="btnHome"><span aria-hidden="true">▶</span>시작하기</button>
+  <p class="need">카메라 권한이 필요합니다</p>
+  <p class="ver">v1.0.0 · POSTURE MONITOR</p>
+</main>
+
 <div class="wrap">
   <header>
     <div>
@@ -182,7 +290,7 @@
           </select>
         </label>
         <label><input type="checkbox" id="soundOn" checked> 경고음</label>
-        <label><input type="checkbox" id="notifyOn"> 다른 창에서도 알림</label>
+        <label><input type="checkbox" id="notifyOn"> 다른 창에서 일할 때도 알림</label>
       </div>
 
       <div class="timeline">
@@ -237,7 +345,18 @@ let ema = null, current = "none";
 let badSince = null, alarmOn = false, alarmTimer = null, titleTimer = null;
 let audioCtx = null, tickTimer = null;
 let pipWin = null; // Document Picture-in-Picture 작은 창
+let notice = null, noticeTimer = null; // 다른 창에서 작업 중일 때 띄우는 시스템 알림
+let loopToken = 0, bgRun = null;
 let stats = freshStats();
+
+// 탭이 가려지면 requestAnimationFrame이 멈추고 setTimeout도 크게 느려지므로,
+// 워커의 타이머로 분석 루프를 계속 돌린다.
+const ticker = new Worker(URL.createObjectURL(new Blob(
+  ["setInterval(() => postMessage(0), 250);"], { type: "text/javascript" })));
+ticker.onmessage = () => {
+  if (!running || !document.hidden || (pipWin && !pipWin.closed) || !bgRun) return;
+  const run = bgRun; bgRun = null; run();
+};
 
 function freshStats() {
   return { ticks: [], good: 0, warn: 0, bad: 0, alarms: 0, streak: 0, best: 0 };
@@ -248,16 +367,26 @@ try {
   const saved = JSON.parse(localStorage.getItem("turtle-prefs") || "{}");
   if (saved.sens) $("#sens").value = saved.sens;
   if (typeof saved.sound === "boolean") $("#soundOn").checked = saved.sound;
+  if (saved.notify && "Notification" in window && Notification.permission === "granted") $("#notifyOn").checked = true;
 } catch {}
 function savePrefs() {
-  try { localStorage.setItem("turtle-prefs", JSON.stringify({ sens: $("#sens").value, sound: $("#soundOn").checked })); } catch {}
+  try {
+    localStorage.setItem("turtle-prefs", JSON.stringify({
+      sens: $("#sens").value, sound: $("#soundOn").checked, notify: $("#notifyOn").checked,
+    }));
+  } catch {}
 }
 $("#sens").addEventListener("change", savePrefs);
 $("#soundOn").addEventListener("change", savePrefs);
 $("#notifyOn").addEventListener("change", async (e) => {
-  if (!e.target.checked || !("Notification" in window)) return;
-  const p = await Notification.requestPermission();
-  if (p !== "granted") { e.target.checked = false; hint("브라우저 알림이 차단되어 있어요. 주소창 옆 설정에서 허용할 수 있어요."); }
+  if (e.target.checked && !("Notification" in window)) {
+    e.target.checked = false;
+    hint("이 브라우저는 알림을 지원하지 않아요.");
+  } else if (e.target.checked && Notification.permission !== "granted") {
+    const p = await Notification.requestPermission();
+    if (p !== "granted") { e.target.checked = false; hint("브라우저 알림이 차단되어 있어요. 주소창 옆 설정에서 허용할 수 있어요."); }
+  }
+  savePrefs();
 });
 
 // ---------- UI helpers ----------
@@ -356,9 +485,12 @@ function beginCalibration() {
 // ---------- detection loop ----------
 function schedule() {
   if (!running) return;
-  if (pipWin && !pipWin.closed) pipWin.requestAnimationFrame(loop); // 작은 창은 항상 보이므로 느려지지 않음
-  else if (document.hidden) setTimeout(loop, 250);                   // 탭이 가려지면 브라우저가 속도를 제한함
-  else requestAnimationFrame(loop);
+  // 여러 경로(본 창 rAF, 작은 창 rAF, 워커)가 같은 루프를 깨울 수 있으니, 가장 먼저 온 것 하나만 실행
+  const token = ++loopToken;
+  const run = () => { if (token === loopToken) loop(); };
+  if (pipWin && !pipWin.closed) pipWin.requestAnimationFrame(run); // 작은 창은 항상 보이므로 느려지지 않음
+  else if (!document.hidden) requestAnimationFrame(run);
+  bgRun = run; // 탭이 가려지면 워커가 이어받음
 }
 function loop() {
   if (!running) return;
@@ -491,16 +623,28 @@ function triggerAlarm() {
   alarmTimer = setInterval(beep, 6000);
   let flip = false;
   titleTimer = setInterval(() => { document.title = (flip = !flip) ? "🐢 거북목!" : "목을 뒤로!"; }, 800);
-  if (document.hidden && $("#notifyOn").checked && "Notification" in window && Notification.permission === "granted") {
-    try { new Notification("🐢 거북목 경보", { body: "턱을 당기고 어깨를 펴세요." }); } catch {}
-  }
+  notify();
+  noticeTimer = setInterval(notify, 20000); // 자세를 고칠 때까지 20초마다 다시 알림
   updateStats();
+}
+// 다른 창에서 일하는 중(이 창에 포커스가 없음)이면 화면 구석에 시스템 알림을 띄움
+function notify() {
+  if (document.hasFocus() || !$("#notifyOn").checked) return;
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  try {
+    notice = new Notification("🐢 거북목!", {
+      body: "턱을 당기고 어깨를 펴세요.",
+      tag: "turtle-alarm", renotify: true, silent: $("#soundOn").checked, // 경고음은 앱이 직접 냄
+    });
+    notice.onclick = () => { window.focus(); notice.close(); };
+  } catch {}
 }
 function clearAlarm() {
   alarmOn = false;
   document.body.classList.remove("alarm");
   if (pipWin && !pipWin.closed) pipWin.document.body.classList.remove("alarm");
-  clearInterval(alarmTimer); clearInterval(titleTimer);
+  clearInterval(alarmTimer); clearInterval(titleTimer); clearInterval(noticeTimer);
+  if (notice) { notice.close(); notice = null; }
   document.title = "거북목 경고등";
 }
 
@@ -607,6 +751,11 @@ async function openMini() {
   });
 }
 
+$("#btnHome").addEventListener("click", () => {
+  document.body.classList.remove("at-home");
+  window.scrollTo(0, 0);
+  $("#btnStart").focus();
+});
 $("#btnMini").addEventListener("click", openMini);
 $("#btnStart").addEventListener("click", start);
 $("#btnStop").addEventListener("click", stop);
