@@ -151,7 +151,7 @@
   .home .tag {
     display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
     border: 1px solid var(--h-line); background: rgba(20, 27, 32, .8);
-    font: 700 .9rem/1 var(--mono); letter-spacing: .14em; color: var(--h-mint);
+    font: 700 1rem/1 var(--mono); letter-spacing: .14em; color: var(--h-mint);
   }
   .home .tag i { width: 9px; height: 9px; border-radius: 50%; background: var(--h-mint); box-shadow: 0 0 8px var(--h-mint); animation: blink 2s ease-in-out infinite; }
   @keyframes blink { 50% { opacity: .35; } }
@@ -178,12 +178,12 @@
     position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s);
     transform: translate(-50%, -50%) scaleX(var(--f, 1)); opacity: var(--o); overflow: visible;
   }
-  .home .office .head { animation: stretch var(--t, 6s) ease-in-out var(--d, 0s) infinite; }
+  .home .office .head { animation: none; } /* 뒤쪽 거북이들은 가만히 */
   @media (max-width: 720px) { .home .office { display: none; } }
   .home .state {
     position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
     padding: 3px 8px; border: 1px solid var(--h-line); background: var(--h-chip);
-    font: 700 .8rem/1 var(--mono); letter-spacing: .12em; color: var(--h-mint);
+    font: 700 .9rem/1 var(--mono); letter-spacing: .12em; color: var(--h-mint);
   }
   .home .state b { font-weight: inherit; animation: good 6s step-end infinite; }
   .home .state b + b { position: absolute; inset: 3px 0; color: var(--h-amber); animation-name: bad; }
@@ -192,29 +192,29 @@
   /* 가끔 거북이 목이 모니터 쪽으로 쭉 빠졌다가 돌아오는 모습 */
   @keyframes stretch { 0%, 55%, 100% { transform: none; } 70%, 85% { transform: translate(12px, 5px); } }
 
-  .home h1 { margin: 14px 0 0; font-size: clamp(2.3rem, 7vw, 3rem); line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
-  .home .sub { margin: 10px 0 0; font: 500 .9rem/1 var(--mono); letter-spacing: .22em; color: var(--h-dim); }
-  .home .lead { margin: 18px 0 0; color: var(--h-muted); line-height: 1.7; font-size: 1.2rem; }
+  .home h1 { margin: 14px 0 0; font-size: clamp(2.8rem, 8vw, 3.8rem); line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
+  .home .sub { margin: 10px 0 0; font: 500 1.05rem/1 var(--mono); letter-spacing: .22em; color: var(--h-dim); }
+  .home .lead { margin: 18px 0 0; color: var(--h-muted); line-height: 1.7; font-size: 1.4rem; }
 
   .home .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 24px; }
   .home .chips span {
     display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px;
     border: 1px solid var(--h-line); background: var(--h-chip); color: var(--h-muted);
-    font-size: 1rem; letter-spacing: .08em; padding: 8px 14px;
+    font-size: 1.15rem; letter-spacing: .08em; padding: 9px 16px;
   }
-  .home .chips svg { width: 17px; height: 17px; }
+  .home .chips svg { width: 19px; height: 19px; }
 
   .home .go {
-    margin-top: 26px; width: min(290px, 100%); padding: 17px 24px; border: none; border-radius: 999px;
-    background: var(--h-mint); color: var(--h-mint-ink); font: 700 1.25rem/1 "IBM Plex Sans KR", "Malgun Gothic", sans-serif; letter-spacing: .2em;
+    margin-top: 26px; width: min(330px, 100%); padding: 19px 26px; border: none; border-radius: 999px;
+    background: var(--h-mint); color: var(--h-mint-ink); font: 700 1.45rem/1 "IBM Plex Sans KR", "Malgun Gothic", sans-serif; letter-spacing: .2em;
     box-shadow: 0 0 28px rgba(111, 211, 168, .25); transition: transform .15s, box-shadow .15s;
   }
   .home .go:hover { transform: translateY(-1px); box-shadow: 0 0 38px rgba(111, 211, 168, .4); }
   .home .go:focus-visible { outline: 2px solid var(--h-ink); outline-offset: 3px; }
   .home .go span { margin-right: 10px; font-size: .8em; }
-  .home .need { margin: 12px 0 0; font-size: .9rem; letter-spacing: .12em; color: var(--h-dim); }
-  .home .ver { margin-top: 28px; font: 500 .85rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
-  @media (prefers-reduced-motion: reduce) { .home .head, .home .office .head, .home .tag i, .home .state b { animation: none; } .home .rings .pulse { display: none; } .home .state b + b { display: none; } }
+  .home .need { margin: 12px 0 0; font-size: 1.05rem; letter-spacing: .12em; color: var(--h-dim); }
+  .home .ver { margin-top: 28px; font: 500 .95rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
+  @media (prefers-reduced-motion: reduce) { .home .head, .home .tag i, .home .state b { animation: none; } .home .rings .pulse { display: none; } .home .state b + b { display: none; } }
 </style>
 </head>
 <body class="at-home">
@@ -910,21 +910,21 @@ $("#btnStop").addEventListener("click", () => stop());
 // 가운데 거북이 그림을 복제해서, 화면 양옆에 모니터 앞에서 일하는 거북이들을 배치
 (function buildOffice() {
   const scene = $(".home .figure svg").innerHTML;
-  // [가로 %, 세로 %, 크기 px, 투명도, 애니메이션 지연(초), 주기(초), 방향(1: 오른쪽 보기, -1: 왼쪽 보기)]
+  // [가로 %, 세로 %, 크기 px, 투명도, 방향(1: 오른쪽 보기, -1: 왼쪽 보기)]
   const desks = [
-    [10, 20, 130, .38, 0, 6.5, 1],
-    [24, 50, 100, .26, -2.4, 7.2, 1],
-    [9, 82, 150, .32, -4.2, 5.6, 1],
-    [90, 19, 125, .36, -1.3, 6.8, -1],
-    [77, 48, 100, .26, -3.3, 5.9, -1],
-    [91, 81, 150, .32, -0.6, 7.5, -1],
+    [10, 20, 130, .2, 1],
+    [24, 50, 100, .14, 1],
+    [9, 82, 150, .17, 1],
+    [90, 19, 125, .19, -1],
+    [77, 48, 100, .14, -1],
+    [91, 81, 150, .17, -1],
   ];
   const office = $("#office");
-  desks.forEach(([x, y, size, o, d, t, f]) => {
+  desks.forEach(([x, y, size, o, f]) => {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 176 176");
     svg.innerHTML = scene;
-    svg.style.cssText = `--x:${x}%;--y:${y}%;--s:${size}px;--o:${o};--d:${d}s;--t:${t}s;--f:${f}`;
+    svg.style.cssText = `--x:${x}%;--y:${y}%;--s:${size}px;--o:${o};--f:${f}`;
     office.appendChild(svg);
   });
 })();
