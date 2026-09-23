@@ -257,6 +257,7 @@
     padding: 10px 8px; border-radius: 10px; transition: background-color var(--ease);
   }
   .item:hover { background: var(--surface-2); }
+  .item-bar { grid-column: 2 / -1; height: 8px; margin-top: -4px; background: var(--surface-3); }
   .item-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); font-size: 1.3rem; }
   .item:hover .item-icon { background: var(--surface); }
   .item-title { margin: 0; font-size: .94rem; font-weight: 600; letter-spacing: -.01em; }
@@ -1111,13 +1112,40 @@ function showReport() {
   $("#rLabel").textContent = `${name} · ${label}`;
   $("#rDetail").textContent = `측정 ${fmt(stats.ticks.length)} 동안 경고 ${stats.alarms}번, 최장 연속 바른 자세 ${fmt(stats.best)}.`;
   pendingRecord = stats.ticks.length ? {
-    at: Date.now(), secs: stats.ticks.length, idx, emoji, name, alarms: stats.alarms, best: stats.best,
+    at: Date.now(), secs: stats.ticks.length, idx, emoji, name, alarms: stats.alarms, best: stats.best, tl: packTicks(stats.ticks),
     good: counted ? Math.round((stats.good / counted) * 100) : null,
   } : null;
   $("#report").showModal();
 }
 
 // ---------- 저장된 기록 ----------
+// 자세 기록(1초마다 상태)을 저장용 문자열로: g 바른 목 / w 슬슬 거북 / b 거북목 / n 인식 안 됨.
+// 길면 최대 400칸으로 줄이고, 각 칸은 그 구간에서 가장 많았던 상태로 채운다.
+const TICK_CODE = { good: "g", warn: "w", bad: "b", none: "n" };
+const CODE_STATE = { g: "good", w: "warn", b: "bad", n: "none" };
+function packTicks(ticks, max = 400) {
+  if (ticks.length <= max) return ticks.map((t) => TICK_CODE[t]).join("");
+  let out = "";
+  for (let i = 0; i < max; i++) {
+    const from = Math.floor((i * ticks.length) / max), to = Math.floor(((i + 1) * ticks.length) / max);
+    const count = {};
+    for (let j = from; j < to; j++) count[ticks[j]] = (count[ticks[j]] || 0) + 1;
+    out += TICK_CODE[Object.keys(count).reduce((a, b) => (count[a] >= count[b] ? a : b))];
+  }
+  return out;
+}
+// 저장된 자세 기록 문자열을 색 띠(linear-gradient)로
+function ticksGradient(code) {
+  const cs = getComputedStyle(root), n = code.length, stops = [];
+  for (let i = 0; i < n; ) {
+    let j = i;
+    while (j < n && code[j] === code[i]) j++;
+    const color = cs.getPropertyValue(STATES[CODE_STATE[code[i]]].cssVar).trim();
+    stops.push(`${color} ${((i / n) * 100).toFixed(2)}% ${((j / n) * 100).toFixed(2)}%`);
+    i = j;
+  }
+  return `linear-gradient(90deg, ${stops.join(", ")})`;
+}
 const HISTORY_KEY = "turtle-records";
 let pendingRecord = null, afterReport = null;
 
@@ -1145,6 +1173,12 @@ function renderHistory() {
     const badge = el("span", "badge" + (r.alarms === 0 ? " good" : r.alarms >= 5 ? " hot" : ""), `경고 ${r.alarms}번`);
     const li = el("li", "item");
     li.append(el("span", "item-icon", r.emoji), main, badge);
+    if (r.tl) {
+      const bar = el("div", "item-bar");
+      bar.style.background = ticksGradient(r.tl);
+      bar.title = "자세 기록";
+      li.append(bar);
+    }
     return li;
   }));
   $("#historyEmpty").hidden = list.length > 0;
