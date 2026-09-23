@@ -49,6 +49,7 @@
   header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
   header h1 { margin: 0; font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1; }
   header p { margin: 6px 0 0; color: var(--muted); }
+  .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; padding: 6px 14px; font-size: .9rem; }
 
   .grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr); gap: 20px; align-items: start; }
   @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
@@ -125,6 +126,17 @@
   dialog .grade { font-size: 4rem; line-height: 1; margin: 14px 0 4px; }
   dialog p { margin: 6px 0; }
   dialog .row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  #askSave h2 { font-size: 1.6rem; }
+
+  .history { margin-top: 22px; }
+  .history-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .history h2 { font-size: 1rem; margin: 0; font-weight: 800; }
+  .history-head button { padding: 4px 12px; font-size: .8rem; border-width: 1.5px; }
+  .history ol { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; }
+  .history li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: .9rem; }
+  .history li b { font-weight: 800; white-space: nowrap; }
+  .history li span { color: var(--muted); text-align: right; }
+  .history .empty { margin: 0; color: var(--muted); font-size: .9rem; }
 
   /* ---------- 홈 화면 ---------- */
   .home {
@@ -155,7 +167,7 @@
   .home .figure { position: relative; width: 176px; height: 176px; margin: 16px 0 4px; }
   .home .figure svg { width: 100%; height: 100%; overflow: visible; }
   .home .figure .ring { fill: none; stroke: var(--h-line); }
-  .home .figure .person { transform-origin: 88px 150px; animation: slump 6s ease-in-out infinite; }
+  .home .figure .head { animation: stretch 6s ease-in-out infinite; }
   .home .state {
     position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
     padding: 3px 8px; border: 1px solid var(--h-line); background: var(--h-chip);
@@ -165,8 +177,8 @@
   .home .state b + b { position: absolute; inset: 3px 0; color: var(--h-amber); animation-name: bad; }
   @keyframes good { 0% { opacity: 1; } 67% { opacity: 0; } 88% { opacity: 1; } }
   @keyframes bad { 0% { opacity: 0; } 67% { opacity: 1; } 88% { opacity: 0; } }
-  /* 가끔 고개가 앞으로 빠졌다가 돌아오는 모습 */
-  @keyframes slump { 0%, 55%, 100% { transform: none; } 70%, 85% { transform: translateX(6px) rotate(9deg); } }
+  /* 가끔 거북이 목이 모니터 쪽으로 쭉 빠졌다가 돌아오는 모습 */
+  @keyframes stretch { 0%, 55%, 100% { transform: none; } 70%, 85% { transform: translate(12px, 5px); } }
 
   .home h1 { margin: 16px 0 0; font-size: clamp(1.7rem, 5vw, 2.1rem); line-height: 1.15; font-weight: 800; letter-spacing: -.01em; }
   .home .sub { margin: 10px 0 0; font: 500 .72rem/1 var(--mono); letter-spacing: .22em; color: var(--h-dim); }
@@ -190,7 +202,7 @@
   .home .go span { margin-right: 10px; font-size: .8em; }
   .home .need { margin: 14px 0 0; font-size: .74rem; letter-spacing: .12em; color: var(--h-dim); }
   .home .ver { margin-top: 40px; font: 500 .7rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
-  @media (prefers-reduced-motion: reduce) { .home .person, .home .tag i, .home .state b { animation: none; } .home .state b + b { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .home .head, .home .tag i, .home .state b { animation: none; } .home .state b + b { display: none; } }
 </style>
 </head>
 <body class="at-home">
@@ -201,25 +213,36 @@
     <svg viewBox="0 0 176 176">
       <circle class="ring" cx="88" cy="88" r="87" stroke-opacity=".6"/>
       <circle class="ring" cx="88" cy="88" r="66"/>
-      <!-- 모니터 -->
-      <rect x="54" y="30" width="68" height="46" rx="3" fill="#1A2329" stroke="#3A4850" stroke-width="2"/>
-      <rect x="59" y="35" width="58" height="36" fill="#223038"/>
-      <line x1="88" y1="76" x2="88" y2="82" stroke="#3A4850" stroke-width="2"/>
-      <line x1="78" y1="83" x2="98" y2="83" stroke="#3A4850" stroke-width="2"/>
-      <!-- 사람 -->
-      <g fill="none" stroke="#6FD3A8" stroke-width="2" stroke-linecap="round">
-        <g class="person">
-          <circle cx="88" cy="97" r="7"/>
-          <line x1="88" y1="104" x2="88" y2="120"/>
-          <path d="M78 112 L88 107 L98 112"/>
+      <g transform="translate(88 100) scale(1.2) translate(-88 -100)">
+      <!-- 모니터 (옆모습) -->
+      <g stroke="#3A4850" stroke-width="2" stroke-linecap="round">
+        <rect x="136" y="46" width="8" height="48" rx="2" fill="#1A2329"/>
+        <line x1="140" y1="94" x2="140" y2="118"/>
+        <line x1="130" y1="119" x2="152" y2="119"/>
+      </g>
+      <line x1="135" y1="52" x2="135" y2="88" stroke="#6FD3A8" stroke-opacity=".45" stroke-width="1.5"/>
+      <line x1="24" y1="126" x2="152" y2="126" stroke="#243036" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- 거북이 -->
+      <g stroke="#6FD3A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <g class="head">
+          <path d="M80 104 L108 93" stroke-width="9"/>
+          <path d="M80 104 L108 93" stroke="#13241D" stroke-width="5"/>
+          <circle cx="114" cy="91" r="8" fill="#13241D"/>
+          <circle cx="117" cy="89" r="1.6" fill="#6FD3A8" stroke="none"/>
         </g>
-        <path d="M88 120 L81 134 M88 120 L95 134"/>
+        <path d="M34 110 L26 114" />
+        <rect x="46" y="112" width="9" height="12" rx="4" fill="#13241D"/>
+        <rect x="82" y="112" width="9" height="12" rx="4" fill="#13241D"/>
+        <path d="M36 114 Q38 76 68 74 Q98 76 100 114 Z" fill="#13241D"/>
+        <path d="M58 100 L62 88 L74 88 L78 100 L74 110 L62 110 Z M62 88 L56 79 M74 88 L80 79 M58 100 L44 100 M78 100 L92 100" fill="none" stroke-opacity=".7"/>
+        <line x1="32" y1="114" x2="104" y2="114"/>
+      </g>
       </g>
     </svg>
     <div class="state"><b>GOOD</b><b>TURTLE</b></div>
   </div>
 
-  <h1>거북목 감지기</h1>
+  <h1>Turtle neck</h1>
   <p class="sub">FORWARD HEAD POSTURE MONITOR</p>
   <p class="lead">컴퓨터 사용 중 나쁜 자세를 실시간으로 감지하고<br>즉시 알림으로 교정을 도와드립니다.</p>
 
@@ -237,6 +260,7 @@
 <div class="wrap">
   <header>
     <div>
+      <button class="back" id="btnBack"><span aria-hidden="true">←</span> 뒤로</button>
       <h1 class="display">거북목 경고등</h1>
       <p>웹캠으로 자세를 보고, 목이 앞으로 빠지면 화면 전체가 빨갛게 켜집니다.</p>
     </div>
@@ -303,6 +327,15 @@
           <span style="--c: var(--idle)">인식 안 됨</span>
         </div>
       </div>
+
+      <div class="history">
+        <div class="history-head">
+          <h2>저장된 기록</h2>
+          <button id="btnClearHistory" hidden>모두 지우기</button>
+        </div>
+        <ol id="history"></ol>
+        <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
+      </div>
     </aside>
   </div>
 </div>
@@ -317,6 +350,15 @@
   <div class="row">
     <button class="primary" id="btnAgain">다시 측정하기</button>
     <button id="btnClose">닫기</button>
+  </div>
+</dialog>
+
+<dialog id="askSave">
+  <h2 class="display">결과를 저장하시겠습니까?</h2>
+  <p style="color: var(--muted)">저장하면 '저장된 기록'에서 다시 볼 수 있어요. 기록은 이 브라우저에만 저장돼요.</p>
+  <div class="row">
+    <button class="primary" id="btnSave">저장</button>
+    <button id="btnNoSave">저장 안 함</button>
   </div>
 </dialog>
 
@@ -453,7 +495,7 @@ async function start() {
   }
 }
 
-function stop() {
+function stop({ report = true } = {}) {
   running = false;
   clearInterval(tickTimer);
   clearAlarm();
@@ -469,7 +511,7 @@ function stop() {
   $("#btnMini").disabled = true;
   if (pipWin && !pipWin.closed) pipWin.close();
   stageMsg("측정을 마쳤어요. 다시 하려면 카메라를 켜세요.", { showButton: true });
-  showReport();
+  if (report) showReport();
 }
 
 function beginCalibration() {
@@ -694,8 +736,68 @@ function showReport() {
   $("#rGrade").textContent = `${emoji} ${idx}`;
   $("#rLabel").textContent = label;
   $("#rDetail").textContent = `측정 ${fmt(stats.ticks.length)} 동안 경고 ${stats.alarms}번, 최장 연속 바른 자세 ${fmt(stats.best)}.`;
+  pendingRecord = stats.ticks.length ? {
+    at: Date.now(), secs: stats.ticks.length, idx, emoji, alarms: stats.alarms, best: stats.best,
+    good: counted ? Math.round((stats.good / counted) * 100) : null,
+  } : null;
   $("#report").showModal();
 }
+
+// ---------- 저장된 기록 ----------
+const HISTORY_KEY = "turtle-records";
+let pendingRecord = null, afterReport = null;
+
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch { return []; }
+}
+function saveRecord(rec) {
+  const list = [rec, ...loadHistory()].slice(0, 50);
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }
+  catch { hint("브라우저 저장 공간을 쓸 수 없어서 기록을 저장하지 못했어요."); return; }
+  hint("결과를 저장했어요.");
+  renderHistory();
+}
+function renderHistory() {
+  const list = loadHistory();
+  const ol = $("#history");
+  ol.replaceChildren(...list.map((r) => {
+    const d = new Date(r.at);
+    const when = `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    const li = document.createElement("li");
+    const b = document.createElement("b");
+    b.textContent = `${r.emoji} ${r.idx}`;
+    const span = document.createElement("span");
+    span.textContent = `${when} · ${fmt(r.secs)} 측정 · 바른 자세 ${r.good == null ? "–" : r.good + "%"} · 경고 ${r.alarms}번`;
+    li.append(b, span);
+    return li;
+  }));
+  $("#historyEmpty").hidden = list.length > 0;
+  $("#btnClearHistory").hidden = list.length === 0;
+}
+renderHistory();
+
+// 결과 창이 닫히면(닫기 · 다시 측정하기 · Esc) 저장할지 물어봄
+$("#report").addEventListener("close", () => {
+  if (pendingRecord) $("#askSave").showModal();
+  else runAfterReport();
+});
+$("#askSave").addEventListener("close", () => {
+  if ($("#askSave").returnValue === "save" && pendingRecord) saveRecord(pendingRecord);
+  $("#askSave").returnValue = "";
+  pendingRecord = null;
+  runAfterReport();
+});
+function runAfterReport() {
+  const next = afterReport; afterReport = null;
+  if (next) next();
+}
+$("#btnSave").addEventListener("click", () => $("#askSave").close("save"));
+$("#btnNoSave").addEventListener("click", () => $("#askSave").close());
+$("#btnClearHistory").addEventListener("click", () => {
+  if (!confirm("저장된 기록을 모두 지울까요?")) return;
+  try { localStorage.removeItem(HISTORY_KEY); } catch {}
+  renderHistory();
+});
 
 // ---------- 작은 창 (Document Picture-in-Picture) ----------
 async function openMini() {
@@ -758,10 +860,15 @@ $("#btnHome").addEventListener("click", () => {
 });
 $("#btnMini").addEventListener("click", openMini);
 $("#btnStart").addEventListener("click", start);
-$("#btnStop").addEventListener("click", stop);
+$("#btnStop").addEventListener("click", () => stop());
+$("#btnBack").addEventListener("click", () => {
+  if (running) stop({ report: false }); // 홈으로 나가면 측정과 카메라를 끔
+  document.body.classList.add("at-home");
+  $("#btnHome").focus();
+});
 $("#btnCalib").addEventListener("click", beginCalibration);
 $("#btnClose").addEventListener("click", () => $("#report").close());
-$("#btnAgain").addEventListener("click", () => { $("#report").close(); start(); });
+$("#btnAgain").addEventListener("click", () => { afterReport = start; $("#report").close(); });
 </script>
 </body>
 </html>
