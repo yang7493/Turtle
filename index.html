@@ -170,8 +170,16 @@
     transform-box: fill-box; transform-origin: center; animation: radar 5s ease-out infinite;
   }
   @keyframes radar { from { transform: scale(1); opacity: 1; } to { transform: scale(9); opacity: 0; } }
-  .home > :not(.rings) { position: relative; z-index: 1; }
+  .home > :not(.rings):not(.office) { position: relative; z-index: 1; }
   .home .figure .head { animation: stretch 6s ease-in-out infinite; }
+  /* 뒤쪽에서 같이 일하는 거북이 동료들 */
+  .home .office { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .home .office svg {
+    position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s);
+    transform: translate(-50%, -50%) scaleX(var(--f, 1)); opacity: var(--o); overflow: visible;
+  }
+  .home .office .head { animation: stretch var(--t, 6s) ease-in-out var(--d, 0s) infinite; }
+  @media (max-width: 720px) { .home .office { display: none; } }
   .home .state {
     position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
     padding: 3px 8px; border: 1px solid var(--h-line); background: var(--h-chip);
@@ -206,12 +214,13 @@
   .home .go span { margin-right: 10px; font-size: .8em; }
   .home .need { margin: 12px 0 0; font-size: .9rem; letter-spacing: .12em; color: var(--h-dim); }
   .home .ver { margin-top: 28px; font: 500 .85rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
-  @media (prefers-reduced-motion: reduce) { .home .head, .home .tag i, .home .state b { animation: none; } .home .rings .pulse { display: none; } .home .state b + b { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .home .head, .home .office .head, .home .tag i, .home .state b { animation: none; } .home .rings .pulse { display: none; } .home .state b + b { display: none; } }
 </style>
 </head>
 <body class="at-home">
 <main class="home" id="home">
   <div class="rings" aria-hidden="true"><svg id="homeRings" viewBox="-1200 -1200 2400 2400"></svg></div>
+  <div class="office" id="office" aria-hidden="true"></div>
   <div class="tag"><i></i>POSTURE MONITOR</div>
 
   <div class="figure" aria-hidden="true">
@@ -898,6 +907,27 @@ $("#btnMini").addEventListener("click", openMini);
 $("#btnStart").addEventListener("click", start);
 $("#btnStop").addEventListener("click", () => stop());
 // ---------- 홈 화면 동심원 ----------
+// 가운데 거북이 그림을 복제해서, 화면 양옆에 모니터 앞에서 일하는 거북이들을 배치
+(function buildOffice() {
+  const scene = $(".home .figure svg").innerHTML;
+  // [가로 %, 세로 %, 크기 px, 투명도, 애니메이션 지연(초), 주기(초), 방향(1: 오른쪽 보기, -1: 왼쪽 보기)]
+  const desks = [
+    [10, 20, 130, .38, 0, 6.5, 1],
+    [24, 50, 100, .26, -2.4, 7.2, 1],
+    [9, 82, 150, .32, -4.2, 5.6, 1],
+    [90, 19, 125, .36, -1.3, 6.8, -1],
+    [77, 48, 100, .26, -3.3, 5.9, -1],
+    [91, 81, 150, .32, -0.6, 7.5, -1],
+  ];
+  const office = $("#office");
+  desks.forEach(([x, y, size, o, d, t, f]) => {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 176 176");
+    svg.innerHTML = scene;
+    svg.style.cssText = `--x:${x}%;--y:${y}%;--s:${size}px;--o:${o};--d:${d}s;--t:${t}s;--f:${f}`;
+    office.appendChild(svg);
+  });
+})();
 (function buildRings() {
   const svg = $("#homeRings"), NS = "http://www.w3.org/2000/svg";
   const add = (r, attrs = {}) => {
