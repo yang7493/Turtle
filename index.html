@@ -1019,26 +1019,57 @@ function triggerAlarm() {
   noticeTimer = setInterval(notify, 20000); // 자세를 고칠 때까지 20초마다 다시 알림
   updateStats();
 }
-// 시스템 알림 글씨 크기는 OS가 정하므로, 큰 글씨를 그림으로 그려 알림 이미지로 붙임
+// 시스템 알림 글씨 크기는 OS가 정하므로, 큰 글씨와 홈 화면 거북이를 그림으로 그려 알림 이미지·아이콘으로 붙임
 // (이미지를 지원하지 않는 환경에서는 무시되고 글자 알림만 뜸)
-let noticeImage = null;
-function getNoticeImage() {
-  if (noticeImage) return noticeImage;
-  try {
-    const c = document.createElement("canvas");
-    c.width = 728; c.height = 364;
-    const g = c.getContext("2d");
-    g.fillStyle = "#DE3A2C"; g.fillRect(0, 0, c.width, c.height);
-    g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle";
-    const font = '"IBM Plex Sans KR", "Malgun Gothic", sans-serif';
-    g.font = `700 140px ${font}`;
-    g.fillText("🐢 거북목!", c.width / 2, 140);
-    g.font = `700 52px ${font}`;
-    g.fillText("턱 당기고 어깨 펴기 🚨", c.width / 2, 275);
-    noticeImage = c.toDataURL("image/png");
-  } catch {}
-  return noticeImage;
+let noticeImage = null, noticeIcon = null;
+function prepareNoticeImages() {
+  if (noticeImage) return;
+  // 홈 화면 거북이 그림을 목을 쭉 내민(TURTLE) 모습으로 복제
+  const inner = $(".home .figure svg").innerHTML.replace('<g class="head">', '<g class="head" transform="translate(12 5)">');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 176 176" width="704" height="704">${inner}</svg>`;
+  const img = new Image();
+  img.onload = () => {
+    try {
+      const font = '"IBM Plex Sans KR", "Malgun Gothic", sans-serif';
+      const rings = (g, cx, cy, radii) => {
+        g.strokeStyle = "#2A383F"; g.lineWidth = 1.5;
+        radii.forEach((r) => { g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke(); });
+      };
+      const tag = (g, x, y, size) => {
+        g.font = `700 ${size}px ${font}`; g.textAlign = "center"; g.textBaseline = "middle";
+        const w = g.measureText("TURTLE").width + size * 1.4, h = size * 1.9;
+        g.fillStyle = "#141B20"; g.fillRect(x - w / 2, y - h / 2, w, h);
+        g.strokeStyle = "#243036"; g.lineWidth = 2; g.strokeRect(x - w / 2, y - h / 2, w, h);
+        g.fillStyle = "#F0A04B"; g.fillText("TURTLE", x, y + 1);
+      };
+
+      // 큰 알림 이미지: 왼쪽 거북이 + 오른쪽 큰 글씨
+      const c = document.createElement("canvas");
+      c.width = 728; c.height = 364;
+      const g = c.getContext("2d");
+      g.fillStyle = "#0C1013"; g.fillRect(0, 0, c.width, c.height);
+      rings(g, 150, 170, [100, 132, 168, 210]);
+      g.drawImage(img, 20, 40, 260, 260);
+      tag(g, 150, 318, 20);
+      g.textAlign = "left"; g.textBaseline = "middle";
+      g.fillStyle = "#FF5A4D"; g.font = `700 104px ${font}`;
+      g.fillText("거북목!", 318, 150);
+      g.fillStyle = "#E8EEF0"; g.font = `700 36px ${font}`;
+      g.fillText("턱 당기고 어깨 펴기 🚨", 322, 248);
+      noticeImage = c.toDataURL("image/png");
+
+      // 알림 아이콘: 어두운 원 안의 거북이
+      const ic = document.createElement("canvas");
+      ic.width = ic.height = 192;
+      const gi = ic.getContext("2d");
+      gi.fillStyle = "#0C1013"; gi.beginPath(); gi.arc(96, 96, 96, 0, Math.PI * 2); gi.fill();
+      gi.drawImage(img, 4, 4, 184, 184);
+      noticeIcon = ic.toDataURL("image/png");
+    } catch {}
+  };
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
+document.fonts.ready.then(prepareNoticeImages);
 // 다른 창에서 일하는 중(이 창에 포커스가 없음)이면 화면 구석에 시스템 알림을 띄움
 function notify() {
   if (document.hasFocus() || !$("#notifyOn").checked) return;
@@ -1046,7 +1077,8 @@ function notify() {
   try {
     notice = new Notification("🐢 거북목!", {
       body: "턱을 당기고 어깨를 펴세요. 🚨🚨🚨",
-      image: getNoticeImage() || undefined,
+      image: noticeImage || undefined,
+      icon: noticeIcon || undefined,
       tag: "turtle-alarm", renotify: true, silent: $("#soundOn").checked, // 경고음은 앱이 직접 냄
     });
     notice.onclick = () => { window.focus(); notice.close(); };
