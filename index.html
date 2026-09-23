@@ -12,123 +12,281 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --shell: #FFFFFF;
-    --paper: #F4F7F3;
-    --ink: #1C3A2E;
-    --muted: #587062;
-    --line: #C3D5C1;
-    --moss: #3F8A57;
-    --amber: #E29A1F;
-    --signal: #DE3A2C;
-    --idle: #9AAFA2;
+    /* ---------- 디자인 토큰 ---------- */
+    --bg: #F2F5F0;
+    --surface: #FFFFFF;
+    --surface-2: #F5F8F4;
+    --surface-3: #EAF0EB;
+    --ink: #17291F;
+    --ink-2: #33473B;
+    --muted: #677A6E;
+    --faint: #97A59C;
+    --line: #E2E9E3;
+    --primary: #2E6A47;
+    --primary-hover: #25593B;
+    --primary-press: #1E4A31;
+    --primary-soft: #E4EFE7;
+    --primary-soft-hover: #D6E7DB;
+    --accent: #7FD3A0;
+    --accent-hover: #93DDB0;
+    /* 자세 상태 색 (스크립트에서 이름으로 읽음) */
+    --moss: #3C8C58;
+    --amber: #DF9427;
+    --signal: #D8483A;
+    --idle: #A7B4AB;
     --state: var(--idle);
+
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --shadow-card: 0 1px 2px rgba(23, 41, 31, .04), 0 8px 28px rgba(23, 41, 31, .06);
+    --ease: 170ms cubic-bezier(.2, .7, .3, 1);
+    --ring: 0 0 0 3px color-mix(in srgb, var(--primary) 28%, transparent);
+
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   *, *::before, *::after { box-sizing: inherit; }
+  [hidden] { display: none !important; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   body {
-    margin: 0; background: var(--shell); color: var(--ink);
+    margin: 0; background: var(--bg); color: var(--ink);
     font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-    font-size: 16px; line-height: 1.6;
-    transition: background-color .25s ease, color .25s ease;
+    font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: anywhere;
+    transition: background-color .25s ease;
   }
-  body.alarm { background: var(--signal); color: #fff; --muted: #FFE1DC; --line: rgba(255,255,255,.35); }
-  .display { font-weight: 700; letter-spacing: -0.01em; }
+  body.alarm { background: var(--signal); }
+  .display { font-weight: 700; letter-spacing: -0.02em; }
 
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 40px; }
-  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-  header h1 { margin: 0; font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1; }
-  header p { margin: 6px 0 0; color: var(--muted); }
-  .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; padding: 6px 14px; font-size: .9rem; }
+  /* ---------- 버튼 ---------- */
+  button { font: inherit; color: inherit; background: none; border: 0; margin: 0; cursor: pointer; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 44px; padding: 0 18px; border-radius: 12px;
+    font-size: .95rem; font-weight: 600; line-height: 1; letter-spacing: -.005em; white-space: nowrap;
+    transition: background-color var(--ease), color var(--ease), box-shadow var(--ease), transform var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:focus-visible { outline: none; box-shadow: var(--ring); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn svg { width: 18px; height: 18px; flex: none; }
 
-  .grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr); gap: 20px; align-items: start; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 1px 2px rgba(23, 41, 31, .12), 0 6px 16px rgba(46, 106, 71, .2); }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 2px 4px rgba(23, 41, 31, .12), 0 10px 22px rgba(46, 106, 71, .26); }
+  .btn-primary:active:not(:disabled) { background: var(--primary-press); transform: translateY(0); box-shadow: 0 1px 2px rgba(23, 41, 31, .16); }
+  .btn-primary:focus-visible { box-shadow: var(--ring), 0 6px 16px rgba(46, 106, 71, .2); }
+  .btn-lg { min-height: 54px; padding: 0 30px; border-radius: 14px; font-size: 1.06rem; font-weight: 700; }
 
+  .btn-secondary { background: var(--primary-soft); color: var(--primary); }
+  .btn-secondary:hover:not(:disabled) { background: var(--primary-soft-hover); }
+  .btn-secondary:active:not(:disabled) { background: #C9DFCF; }
+
+  .btn-ghost { min-height: 36px; padding: 0 12px 0 8px; border-radius: 10px; color: var(--muted); font-size: .92rem; }
+  .btn-ghost:hover:not(:disabled) { background: rgba(23, 41, 31, .05); color: var(--ink); }
+  .btn-ghost:active:not(:disabled) { background: rgba(23, 41, 31, .09); }
+
+  .btn-text { min-height: 30px; padding: 0 10px; border-radius: 8px; color: var(--faint); font-size: .82rem; font-weight: 500; }
+  .btn-text:hover:not(:disabled) { color: var(--signal); background: color-mix(in srgb, var(--signal) 8%, transparent); }
+
+  /* ---------- 페이지 ---------- */
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 72px; }
+  .page-head { margin-bottom: 28px; }
+  .page-head h1 { margin: 14px 0 0; font-size: clamp(2rem, 3.4vw, 2.75rem); line-height: 1.15; letter-spacing: -.03em; }
+  .page-head p { margin: 8px 0 0; color: var(--muted); font-size: 1.02rem; }
+  body.alarm .page-head h1, body.alarm .page-head p { color: #fff; }
+  body.alarm .page-head .btn-ghost { color: rgba(255, 255, 255, .85); }
+  body.alarm .page-head .btn-ghost:hover { background: rgba(255, 255, 255, .14); color: #fff; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(340px, 1fr); gap: 28px; align-items: start; }
+  .col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+  .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); padding: 26px; }
+  .card-title { margin: 0; font-size: 1.05rem; font-weight: 700; letter-spacing: -.015em; }
+  .section + .section { margin-top: 32px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; min-height: 30px; }
+
+  /* ---------- 카메라 모니터링 영역 ---------- */
   .stage {
-    position: relative; aspect-ratio: 4 / 3; background: #1B2D23; border-radius: 0; overflow: hidden;
-    outline: 6px solid var(--state); outline-offset: -6px; transition: outline-color .2s;
+    position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; isolation: isolate;
+    background: radial-gradient(120% 90% at 50% 30%, #24432F 0%, #182C21 55%, #12211A 100%);
+    box-shadow: var(--shadow-card);
   }
+  .stage::after {
+    content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
+    box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--state) 90%, transparent);
+    transition: box-shadow .2s;
+  }
+  .stage[data-state="none"]::after { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
   .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  /* 촬영 영역을 알려주는 은은한 모서리 프레임 */
+  .frame {
+    position: absolute; inset: 22px; z-index: 2; pointer-events: none;
+    --c: rgba(255, 255, 255, .26); --l: 26px;
+    background:
+      linear-gradient(var(--c), var(--c)) left top / var(--l) 2px,
+      linear-gradient(var(--c), var(--c)) left top / 2px var(--l),
+      linear-gradient(var(--c), var(--c)) right top / var(--l) 2px,
+      linear-gradient(var(--c), var(--c)) right top / 2px var(--l),
+      linear-gradient(var(--c), var(--c)) left bottom / var(--l) 2px,
+      linear-gradient(var(--c), var(--c)) left bottom / 2px var(--l),
+      linear-gradient(var(--c), var(--c)) right bottom / var(--l) 2px,
+      linear-gradient(var(--c), var(--c)) right bottom / 2px var(--l);
+    background-repeat: no-repeat;
+  }
   .stage-msg {
-    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 14px; padding: 24px; text-align: center; color: #EAF3E6; background: rgba(27, 45, 35, .6);
+    position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 32px; text-align: center; color: #EAF3EC;
+    background: radial-gradient(80% 70% at 50% 45%, rgba(18, 33, 26, .3), rgba(18, 33, 26, .72));
   }
-  .stage-msg[hidden] { display: none; }
-  .stage-msg .big { font-size: clamp(3rem, 12vw, 6rem); line-height: 1; }
-  .stage-msg p { margin: 0; max-width: 34ch; }
-  .stage-msg small { color: #B7CBBE; max-width: 36ch; }
-  .hint { min-height: 1.6em; margin: 10px 4px 0; color: var(--muted); font-weight: 600; }
-
-  button, select {
-    font: inherit; font-weight: 700; border-radius: 0; cursor: pointer;
-    border: 2px solid var(--ink); background: transparent; color: var(--ink); padding: 10px 18px;
+  .stage-msg .big {
+    width: 104px; height: 104px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 22px;
+    font-size: 3.3rem; line-height: 1; background: rgba(255, 255, 255, .06); box-shadow: 0 0 0 10px rgba(255, 255, 255, .03);
   }
-  button.primary { background: var(--moss); border-color: var(--moss); color: #fff; font-size: 1.1rem; padding: 14px 26px; }
-  button:disabled { opacity: .5; cursor: wait; }
-  button:focus-visible, select:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
-  body.alarm button, body.alarm select { border-color: #fff; color: #fff; }
+  .stage-msg p { margin: 0; max-width: 30ch; font-size: 1.12rem; font-weight: 600; line-height: 1.55; letter-spacing: -.01em; color: #F3F8F4; }
+  .stage-msg .btn-lg { margin-top: 26px; }
+  .stage .btn-primary { background: var(--accent); color: #0F2A1B; box-shadow: 0 8px 24px rgba(127, 211, 160, .22); }
+  .stage .btn-primary:hover:not(:disabled) { background: var(--accent-hover); box-shadow: 0 12px 28px rgba(127, 211, 160, .3); }
+  .stage .btn-primary:active:not(:disabled) { background: #6CC690; box-shadow: none; }
+  .stage .btn-primary:focus-visible { box-shadow: 0 0 0 3px rgba(127, 211, 160, .45); }
+  .stage-msg small { display: block; margin-top: 18px; max-width: 34em; font-size: .85rem; line-height: 1.5; color: rgba(234, 243, 236, .62); }
+  .stage-msg small svg { width: 14px; height: 14px; margin-right: 5px; vertical-align: -2px; }
 
-  .panel { background: var(--paper); border: 1px solid var(--line); padding: 22px; }
-  body.alarm .panel { background: rgba(255,255,255,.12); }
-  .reading { display: flex; align-items: center; gap: 18px; }
+  .hint {
+    display: flex; align-items: center; min-height: 46px; margin: -6px 0 0; padding: 11px 16px; border-radius: var(--radius-md);
+    background: var(--primary-soft); color: var(--primary); font-size: .93rem; font-weight: 500;
+  }
+  .hint:empty { background: transparent; }
+
+  /* ---------- 자세 측정 대시보드 카드 ---------- */
+  .status { display: flex; align-items: center; gap: 16px; }
   .lamp {
-    flex: none; width: 108px; height: 108px; border-radius: 50%; background: var(--state);
-    display: grid; place-items: center; font-size: 3rem;
-    box-shadow: 0 0 0 8px color-mix(in srgb, var(--state) 25%, transparent);
-    transition: background-color .2s, box-shadow .2s;
+    flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 2rem;
+    background: color-mix(in srgb, var(--state) 16%, #fff); transition: background-color .2s;
   }
-  body.alarm .lamp { box-shadow: 0 0 0 8px rgba(255,255,255,.35); }
-  .reading .word { font-size: 2.3rem; line-height: 1.05; margin: 0; }
-  .reading .note { margin: 6px 0 0; color: var(--muted); }
-  .score { display: flex; align-items: baseline; gap: 8px; margin: 20px 0 4px; }
-  .score b { font-size: 4.2rem; line-height: 1; }
-  .score span { color: var(--muted); }
-  .meter { height: 10px; background: var(--line); overflow: hidden; }
-  .meter i { display: block; height: 100%; width: 0%; background: var(--state); transition: width .2s, background-color .2s; }
+  .status-body { flex: 1; min-width: 0; }
+  .status-line { display: flex; align-items: center; gap: 9px; }
+  .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--state); box-shadow: 0 0 0 4px color-mix(in srgb, var(--state) 20%, transparent); transition: background-color .2s, box-shadow .2s; }
+  .status .word { margin: 0; font-size: 1.4rem; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; }
+  .status .note { margin: 4px 0 0; color: var(--muted); font-size: .92rem; line-height: 1.45; }
+  .phase {
+    flex: none; align-self: flex-start; padding: 4px 10px; border-radius: 999px;
+    font-size: .76rem; font-weight: 600; white-space: nowrap; background: var(--surface-3); color: var(--muted);
+  }
+  .dash[data-phase="calibrating"] .phase { background: color-mix(in srgb, var(--amber) 16%, #fff); color: #9A620F; }
+  .dash[data-phase="watching"] .phase { background: var(--primary-soft); color: var(--primary); }
+  .dash[data-phase="done"] .phase { background: var(--surface-3); color: var(--ink-2); }
+  .dash[data-phase="error"] .phase { background: color-mix(in srgb, var(--signal) 12%, #fff); color: #B2362A; }
+  .dash[data-phase="watching"] .dot { animation: live 1.8s ease-in-out infinite; }
+  @keyframes live { 50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--state) 8%, transparent); } }
 
-  dl.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin: 22px 0 0; }
-  dl.stats div { border-top: 2px solid var(--line); padding-top: 8px; }
-  dl.stats dt { font-size: .85rem; color: var(--muted); }
-  dl.stats dd { margin: 0; font-size: 1.6rem; }
+  .score-wrap { margin-top: 28px; }
+  .score { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; }
+  .score b { font-size: 3rem; line-height: 1; font-weight: 700; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+  .score span { color: var(--muted); font-size: .93rem; font-weight: 500; }
+  .meter { position: relative; height: 8px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 0%; border-radius: inherit; background: var(--state); transition: width .2s, background-color .2s; }
+  /* 45점(거북목 경계), 70점(바른 목 경계) 눈금 */
+  .meter::before, .meter::after { content: ""; position: absolute; top: 0; bottom: 0; width: 2px; background: var(--surface); z-index: 1; }
+  .meter::before { left: 45%; }
+  .meter::after { left: 70%; }
 
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; align-items: center; }
-  .controls label { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: .95rem; }
-  .controls input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--moss); }
+  dl.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 22px 0 0; }
+  dl.stats div { padding: 14px 16px; border-radius: var(--radius-md); background: var(--surface-2); }
+  dl.stats dt { font-size: .8rem; font-weight: 500; color: var(--muted); }
+  dl.stats dd { margin: 4px 0 0; font-size: 1.45rem; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 
-  .timeline { margin-top: 20px; }
-  .timeline h2 { font-size: 1rem; margin: 0 0 8px; font-weight: 700; }
-  .timeline canvas { width: 100%; height: 36px; display: block; background: var(--line); }
-  .legend { display: flex; gap: 16px; margin-top: 8px; font-size: .85rem; color: var(--muted); flex-wrap: wrap; }
-  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--c); }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px; }
+  .actions .btn:last-child { grid-column: 1 / -1; }
 
+  .settings { display: flex; flex-direction: column; margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 48px; font-size: .93rem; font-weight: 500; color: var(--ink-2); cursor: pointer; }
+  select {
+    appearance: none; -webkit-appearance: none; min-width: 124px; height: 38px; padding: 0 36px 0 14px; border-radius: 10px;
+    border: 1px solid var(--line); color: var(--ink); font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer;
+    background: var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='%23677A6E' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center;
+    transition: border-color var(--ease), box-shadow var(--ease), background-color var(--ease);
+  }
+  select:hover { border-color: #C9D5CC; background-color: var(--surface); }
+  select:focus-visible { outline: none; border-color: var(--primary); box-shadow: var(--ring); }
+  .switch {
+    appearance: none; -webkit-appearance: none; position: relative; flex: none; width: 42px; height: 24px; margin: 0;
+    border-radius: 999px; background: #D2DBD4; cursor: pointer; transition: background-color var(--ease), box-shadow var(--ease);
+  }
+  .switch::before {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 3px rgba(23, 41, 31, .25); transition: transform var(--ease);
+  }
+  .switch:hover { background: #C5D0C8; }
+  .switch:checked { background: var(--primary); }
+  .switch:checked:hover { background: var(--primary-hover); }
+  .switch:checked::before { transform: translateX(18px); }
+  .switch:focus-visible { outline: none; box-shadow: var(--ring); }
+
+  /* ---------- 기록 ---------- */
+  .timeline canvas { display: block; width: 100%; height: 44px; border-radius: 10px; background: var(--surface-3); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 14px; font-size: .84rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend span::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent); }
+
+  .history ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto; }
+  .item {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+    padding: 12px 14px; border-radius: var(--radius-md); background: var(--surface-2); transition: background-color var(--ease);
+  }
+  .item:hover { background: var(--surface-3); }
+  .item-icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); font-size: 1.15rem; }
+  .item-title { margin: 0; font-size: .95rem; font-weight: 700; letter-spacing: -.01em; }
+  .item-sub { margin: 1px 0 0; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .item-meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+  .meta { padding: 4px 10px; border-radius: 999px; background: var(--surface); color: var(--ink-2); font-size: .78rem; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  @media (max-width: 560px) {
+    .item { grid-template-columns: 40px minmax(0, 1fr); }
+    .item-meta { grid-column: 2; justify-content: flex-start; }
+  }
+  .history .empty { margin: 0; padding: 22px; border-radius: var(--radius-md); background: var(--surface-2); color: var(--muted); font-size: .9rem; text-align: center; }
+
+  /* ---------- 경고 배너 · 대화상자 ---------- */
   .banner {
-    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
-    background: #fff; color: var(--signal); padding: 14px 26px; font-size: 1.4rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,.25); display: none; white-space: nowrap;
+    position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 5;
+    padding: 14px 26px; border-radius: 999px; background: #fff; color: var(--signal);
+    font-size: 1.15rem; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, .2); display: none; white-space: nowrap;
   }
   body.alarm .banner { display: block; animation: nudge 1s ease-in-out infinite; }
   @keyframes nudge { 50% { transform: translateX(-50%) translateY(-6px); } }
-  @media (prefers-reduced-motion: reduce) { body.alarm .banner { animation: none; } * { transition: none !important; } }
 
-  dialog { border: 1px solid var(--line); border-radius: 0; padding: 28px; max-width: min(460px, 92vw); background: var(--paper); color: var(--ink); }
-  dialog::backdrop { background: rgba(10, 20, 15, .55); }
-  dialog h2 { margin: 0; font-size: 2.2rem; line-height: 1.1; }
-  dialog .grade { font-size: 4rem; line-height: 1; margin: 14px 0 4px; }
+  dialog {
+    border: 0; border-radius: 24px; padding: 32px; width: min(440px, calc(100vw - 32px));
+    background: var(--surface); color: var(--ink); box-shadow: 0 24px 64px rgba(12, 24, 17, .22);
+  }
+  dialog::backdrop { background: rgba(14, 26, 19, .45); }
+  dialog h2 { margin: 0; font-size: 1.35rem; line-height: 1.3; letter-spacing: -.02em; }
+  dialog .grade { margin: 18px 0 8px; font-size: 3.25rem; line-height: 1; font-variant-numeric: tabular-nums; }
   dialog p { margin: 6px 0; }
-  dialog .row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-  #askSave h2 { font-size: 1.6rem; }
+  #rLabel { font-weight: 600; color: var(--ink-2); }
+  dialog .row { display: flex; gap: 10px; margin-top: 26px; }
+  dialog .row .btn { flex: 1; }
+  #askSave h2 { font-size: 1.25rem; }
 
-  .history { margin-top: 22px; }
-  .history-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-  .history h2 { font-size: 1rem; margin: 0; font-weight: 700; }
-  .history-head button { padding: 4px 12px; font-size: .8rem; border-width: 1.5px; }
-  .history ol { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; }
-  .history li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: .9rem; }
-  .history li b { font-weight: 700; white-space: nowrap; }
-  .history li span { color: var(--muted); text-align: right; }
-  .history .empty { margin: 0; color: var(--muted); font-size: .9rem; }
+  /* 한 줄 배치에서는 카메라 → 안내 → 대시보드 → 기록 순서로 */
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .col { display: contents; }
+    .stage { order: 1; } .hint { order: 2; } .dash { order: 3; } .records { order: 4; }
+    .hint { margin: 0; }
+    .hint:empty { display: none; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 20px 16px 56px; }
+    .card { padding: 20px; }
+    .actions { grid-template-columns: minmax(0, 1fr); }
+    .actions .btn { white-space: normal; }
+    .stage { aspect-ratio: 3 / 4; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body.alarm .banner, .dash[data-phase="watching"] .dot { animation: none; }
+    * { transition: none !important; }
+  }
 
   /* ---------- 홈 화면 ---------- */
   .home {
@@ -270,84 +428,103 @@
 </main>
 
 <div class="wrap">
-  <header>
-    <div>
-      <button class="back" id="btnBack"><span aria-hidden="true">←</span> 뒤로</button>
-      <h1 class="display">거북목 경고등</h1>
-      <p>웹캠으로 자세를 보고, 목이 앞으로 빠지면 화면 전체가 빨갛게 켜집니다.</p>
-    </div>
+  <header class="page-head">
+    <button class="btn btn-ghost back" id="btnBack">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5l-5 5 5 5"/></svg>
+      뒤로
+    </button>
+    <h1 class="display">거북목 경고등</h1>
+    <p>웹캠으로 자세를 보고, 목이 앞으로 빠지면 화면 전체가 빨갛게 켜집니다.</p>
   </header>
 
   <div class="grid">
-    <section>
-      <div class="stage" id="stage">
+    <div class="col">
+      <div class="stage" id="stage" data-state="none">
         <video id="cam" playsinline muted></video>
         <canvas id="overlay"></canvas>
+        <div class="frame" aria-hidden="true"></div>
         <div class="stage-msg" id="stageMsg">
           <div class="big" aria-hidden="true">🐢</div>
           <p id="stageText">바르게 앉은 자세를 기준으로 저장한 뒤, 그보다 목이 앞으로 나오면 알려드려요.</p>
-          <button class="primary" id="btnStart">카메라 켜고 시작</button>
-          <small>영상은 이 브라우저 안에서만 분석되고 어디에도 전송되지 않아요.</small>
+          <button class="btn btn-primary btn-lg" id="btnStart">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5.5" width="10.5" height="9" rx="2"/><path d="M13 9l4.5-2.5v7L13 11"/></svg>
+            카메라 켜고 시작
+          </button>
+          <small>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.8"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2"/></svg>
+            영상은 이 브라우저 안에서만 분석되고 어디에도 전송되지 않아요.
+          </small>
         </div>
       </div>
       <p class="hint" id="hint" aria-live="polite"></p>
-    </section>
 
-    <aside class="panel">
-      <div class="reading">
-        <div class="lamp" id="lamp" aria-hidden="true">🐢</div>
-        <div>
-          <p class="word display" id="word">대기 중</p>
-          <p class="note" id="note">시작하면 자세를 읽기 시작해요.</p>
+      <section class="card records">
+        <div class="section timeline">
+          <div class="section-head"><h2 class="card-title">자세 기록</h2></div>
+          <canvas id="tl"></canvas>
+          <div class="legend">
+            <span style="--c: var(--moss)">바른 목</span>
+            <span style="--c: var(--amber)">슬슬 거북</span>
+            <span style="--c: var(--signal)">거북목</span>
+            <span style="--c: var(--idle)">인식 안 됨</span>
+          </div>
         </div>
-      </div>
 
-      <div class="score"><b class="display" id="score">–</b><span>/ 100 자세 점수</span></div>
-      <div class="meter"><i id="meter"></i></div>
-
-      <dl class="stats">
-        <div><dt>측정 시간</dt><dd class="display" id="sTime">0:00</dd></div>
-        <div><dt>바른 자세 비율</dt><dd class="display" id="sGood">–</dd></div>
-        <div><dt>경고 횟수</dt><dd class="display" id="sAlarms">0</dd></div>
-        <div><dt>최장 연속 바른 자세</dt><dd class="display" id="sStreak">0:00</dd></div>
-      </dl>
-
-      <div class="controls">
-        <button id="btnCalib" disabled>기준 자세 다시 잡기</button>
-        <button id="btnStop" disabled>끝내고 결과 보기</button>
-        <button id="btnMini" disabled>작은 창으로 띄우기</button>
-      </div>
-      <div class="controls">
-        <label>민감도
-          <select id="sens">
-            <option value="0.26">느슨하게</option>
-            <option value="0.18" selected>보통</option>
-            <option value="0.11">예민하게</option>
-          </select>
-        </label>
-        <label><input type="checkbox" id="soundOn" checked> 경고음</label>
-        <label><input type="checkbox" id="notifyOn"> 다른 창에서 일할 때도 알림</label>
-      </div>
-
-      <div class="timeline">
-        <h2>자세 기록</h2>
-        <canvas id="tl"></canvas>
-        <div class="legend">
-          <span style="--c: var(--moss)">바른 목</span>
-          <span style="--c: var(--amber)">슬슬 거북</span>
-          <span style="--c: var(--signal)">거북목</span>
-          <span style="--c: var(--idle)">인식 안 됨</span>
+        <div class="section history">
+          <div class="section-head">
+            <h2 class="card-title">저장된 기록</h2>
+            <button class="btn btn-text" id="btnClearHistory" hidden>모두 지우기</button>
+          </div>
+          <ol id="history"></ol>
+          <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
         </div>
-      </div>
+      </section>
+    </div>
 
-      <div class="history">
-        <div class="history-head">
-          <h2>저장된 기록</h2>
-          <button id="btnClearHistory" hidden>모두 지우기</button>
+    <aside class="col">
+      <section class="card dash" id="dash" data-phase="idle" data-state="none">
+        <div class="status">
+          <div class="lamp" id="lamp" aria-hidden="true">🐢</div>
+          <div class="status-body">
+            <div class="status-line">
+              <span class="dot" aria-hidden="true"></span>
+              <p class="word" id="word">대기 중</p>
+            </div>
+            <p class="note" id="note">시작하면 자세를 읽기 시작해요.</p>
+          </div>
+          <span class="phase" id="phase">측정 전</span>
         </div>
-        <ol id="history"></ol>
-        <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
-      </div>
+
+        <div class="score-wrap">
+          <div class="score"><b id="score">–</b><span>/ 100 자세 점수</span></div>
+          <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+        </div>
+
+        <dl class="stats">
+          <div><dt>측정 시간</dt><dd id="sTime">0:00</dd></div>
+          <div><dt>바른 자세 비율</dt><dd id="sGood">–</dd></div>
+          <div><dt>경고 횟수</dt><dd id="sAlarms">0</dd></div>
+          <div><dt>최장 연속 바른 자세</dt><dd id="sStreak">0:00</dd></div>
+        </dl>
+
+        <div class="actions">
+          <button class="btn btn-secondary" id="btnCalib" disabled>기준 자세 다시 잡기</button>
+          <button class="btn btn-secondary" id="btnStop" disabled>끝내고 결과 보기</button>
+          <button class="btn btn-secondary" id="btnMini" disabled>작은 창으로 띄우기</button>
+        </div>
+
+        <div class="settings">
+          <label class="setting">민감도
+            <select id="sens">
+              <option value="0.26">느슨하게</option>
+              <option value="0.18" selected>보통</option>
+              <option value="0.11">예민하게</option>
+            </select>
+          </label>
+          <label class="setting">경고음 <input type="checkbox" class="switch" id="soundOn" checked></label>
+          <label class="setting">다른 창에서 일할 때도 알림 <input type="checkbox" class="switch" id="notifyOn"></label>
+        </div>
+      </section>
     </aside>
   </div>
 </div>
@@ -360,8 +537,8 @@
   <p id="rLabel"></p>
   <p id="rDetail" style="color: var(--muted)"></p>
   <div class="row">
-    <button class="primary" id="btnAgain">다시 측정하기</button>
-    <button id="btnClose">닫기</button>
+    <button class="btn btn-primary" id="btnAgain">다시 측정하기</button>
+    <button class="btn btn-secondary" id="btnClose">닫기</button>
   </div>
 </dialog>
 
@@ -369,8 +546,8 @@
   <h2 class="display">결과를 저장하시겠습니까?</h2>
   <p style="color: var(--muted)">저장하면 '저장된 기록'에서 다시 볼 수 있어요. 기록은 이 브라우저에만 저장돼요.</p>
   <div class="row">
-    <button class="primary" id="btnSave">저장</button>
-    <button id="btnNoSave">저장 안 함</button>
+    <button class="btn btn-primary" id="btnSave">저장</button>
+    <button class="btn btn-secondary" id="btnNoSave">저장 안 함</button>
   </div>
 </dialog>
 
@@ -450,9 +627,17 @@ function stageMsg(text, { showButton = false } = {}) {
   if (text) $("#stageText").textContent = text;
   $("#btnStart").hidden = !showButton;
 }
+// 측정 단계 배지: 나중에 상태가 늘어나면 여기에 추가
+const PHASES = { idle: "측정 전", calibrating: "기준 설정 중", watching: "측정 중", done: "측정 완료", error: "오류" };
+function setPhase(key) {
+  $("#dash").dataset.phase = key;
+  $("#phase").textContent = PHASES[key];
+}
 function setState(key, score) {
   const s = STATES[key];
   root.style.setProperty("--state", `var(${s.cssVar})`);
+  $("#stage").dataset.state = key;
+  $("#dash").dataset.state = key;
   $("#word").textContent = s.word;
   $("#note").textContent = s.note;
   $("#lamp").textContent = s.emoji;
@@ -501,6 +686,7 @@ async function start() {
     stageMsg(denied
       ? "카메라 권한이 막혀 있어요. 주소창의 카메라 아이콘에서 허용한 뒤 다시 시작하세요."
       : "카메라나 모델을 불러오지 못했어요. 인터넷 연결과 다른 앱의 카메라 사용 여부를 확인한 뒤 다시 시작하세요.", { showButton: true });
+    setPhase("error");
     console.error(e);
   } finally {
     $("#btnStart").disabled = false;
@@ -514,6 +700,7 @@ function stop({ report = true } = {}) {
   if (stream) stream.getTracks().forEach((t) => t.stop());
   stream = null;
   mode = "stopped";
+  setPhase("done");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   setState("none", null);
   $("#word").textContent = "측정 끝";
@@ -531,6 +718,7 @@ function beginCalibration() {
   clearAlarm();
   calib = { samples: [], until: performance.now() + 3000 };
   mode = "calibrating";
+  setPhase("calibrating");
   setState("none", null);
   $("#word").textContent = "기준 잡는 중";
   $("#note").textContent = "허리를 펴고 화면을 정면으로 보세요.";
@@ -593,6 +781,7 @@ function handle(res, now) {
       }
       base = { neck: median(calib.samples.map((s) => s.neck)), close: median(calib.samples.map((s) => s.close)) };
       mode = "watching";
+      setPhase("watching");
       stageMsg(null);
       hint("기준 자세를 저장했어요. 이제 편하게 작업하세요.");
     }
@@ -808,12 +997,17 @@ function renderHistory() {
   ol.replaceChildren(...list.map((r) => {
     const d = new Date(r.at);
     const when = `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-    const li = document.createElement("li");
-    const b = document.createElement("b");
-    b.textContent = `${r.emoji} ${r.idx}${r.name ? " " + r.name : ""}`;
-    const span = document.createElement("span");
-    span.textContent = `${when} · ${fmt(r.secs)} 측정 · 바른 자세 ${r.good == null ? "–" : r.good + "%"} · 경고 ${r.alarms}번`;
-    li.append(b, span);
+    const el = (tag, cls, text) => { const n = document.createElement(tag); n.className = cls; if (text != null) n.textContent = text; return n; };
+    const main = el("div", "item-main");
+    main.append(el("p", "item-title", `${r.name || "거북이 지수"} · ${r.idx}`), el("p", "item-sub", when));
+    const meta = el("div", "item-meta");
+    meta.append(
+      el("span", "meta", `${fmt(r.secs)} 측정`),
+      el("span", "meta", `바른 자세 ${r.good == null ? "–" : r.good + "%"}`),
+      el("span", "meta", `경고 ${r.alarms}번`),
+    );
+    const li = el("li", "item");
+    li.append(el("span", "item-icon", r.emoji), main, meta);
     return li;
   }));
   $("#historyEmpty").hidden = list.length > 0;
