@@ -151,12 +151,12 @@
   .home .tag {
     display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
     border: 1px solid var(--h-line); background: rgba(20, 27, 32, .8);
-    font: 700 .72rem/1 var(--mono); letter-spacing: .14em; color: var(--h-mint);
+    font: 700 .9rem/1 var(--mono); letter-spacing: .14em; color: var(--h-mint);
   }
-  .home .tag i { width: 7px; height: 7px; border-radius: 50%; background: var(--h-mint); box-shadow: 0 0 8px var(--h-mint); animation: blink 2s ease-in-out infinite; }
+  .home .tag i { width: 9px; height: 9px; border-radius: 50%; background: var(--h-mint); box-shadow: 0 0 8px var(--h-mint); animation: blink 2s ease-in-out infinite; }
   @keyframes blink { 50% { opacity: .35; } }
 
-  .home .figure { position: relative; width: 176px; height: 176px; margin: 16px 0 4px; }
+  .home .figure { position: relative; width: 236px; height: 236px; margin: 14px 0 2px; }
   .home .figure svg { width: 100%; height: 100%; overflow: visible; }
   /* 거북이를 중심으로 화면 끝까지 퍼지는 동심원 (스크롤 영역에 영향 없도록 fixed 레이어) */
   .home .rings { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
@@ -175,7 +175,7 @@
   .home .state {
     position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
     padding: 3px 8px; border: 1px solid var(--h-line); background: var(--h-chip);
-    font: 700 .62rem/1 var(--mono); letter-spacing: .12em; color: var(--h-mint);
+    font: 700 .8rem/1 var(--mono); letter-spacing: .12em; color: var(--h-mint);
   }
   .home .state b { font-weight: inherit; animation: good 6s step-end infinite; }
   .home .state b + b { position: absolute; inset: 3px 0; color: var(--h-amber); animation-name: bad; }
@@ -184,28 +184,28 @@
   /* 가끔 거북이 목이 모니터 쪽으로 쭉 빠졌다가 돌아오는 모습 */
   @keyframes stretch { 0%, 55%, 100% { transform: none; } 70%, 85% { transform: translate(12px, 5px); } }
 
-  .home h1 { margin: 16px 0 0; font-size: clamp(1.7rem, 5vw, 2.1rem); line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
-  .home .sub { margin: 10px 0 0; font: 500 .72rem/1 var(--mono); letter-spacing: .22em; color: var(--h-dim); }
-  .home .lead { margin: 22px 0 0; color: var(--h-muted); line-height: 1.75; font-size: .98rem; }
+  .home h1 { margin: 14px 0 0; font-size: clamp(2.3rem, 7vw, 3rem); line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
+  .home .sub { margin: 10px 0 0; font: 500 .9rem/1 var(--mono); letter-spacing: .22em; color: var(--h-dim); }
+  .home .lead { margin: 18px 0 0; color: var(--h-muted); line-height: 1.7; font-size: 1.2rem; }
 
-  .home .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 28px; }
+  .home .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 24px; }
   .home .chips span {
     display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px;
     border: 1px solid var(--h-line); background: var(--h-chip); color: var(--h-muted);
-    font-size: .82rem; letter-spacing: .08em;
+    font-size: 1rem; letter-spacing: .08em; padding: 8px 14px;
   }
-  .home .chips svg { width: 13px; height: 13px; }
+  .home .chips svg { width: 17px; height: 17px; }
 
   .home .go {
-    margin-top: 30px; width: min(236px, 100%); padding: 14px 20px; border: none; border-radius: 0;
-    background: var(--h-mint); color: var(--h-mint-ink); font: 700 1rem/1 "IBM Plex Sans KR", "Malgun Gothic", sans-serif; letter-spacing: .2em;
+    margin-top: 26px; width: min(290px, 100%); padding: 17px 24px; border: none; border-radius: 0;
+    background: var(--h-mint); color: var(--h-mint-ink); font: 700 1.25rem/1 "IBM Plex Sans KR", "Malgun Gothic", sans-serif; letter-spacing: .2em;
     box-shadow: 0 0 28px rgba(111, 211, 168, .25); transition: transform .15s, box-shadow .15s;
   }
   .home .go:hover { transform: translateY(-1px); box-shadow: 0 0 38px rgba(111, 211, 168, .4); }
   .home .go:focus-visible { outline: 2px solid var(--h-ink); outline-offset: 3px; }
   .home .go span { margin-right: 10px; font-size: .8em; }
-  .home .need { margin: 14px 0 0; font-size: .74rem; letter-spacing: .12em; color: var(--h-dim); }
-  .home .ver { margin-top: 40px; font: 500 .7rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
+  .home .need { margin: 12px 0 0; font-size: .9rem; letter-spacing: .12em; color: var(--h-dim); }
+  .home .ver { margin-top: 28px; font: 500 .85rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
   @media (prefers-reduced-motion: reduce) { .home .head, .home .tag i, .home .state b { animation: none; } .home .rings .pulse { display: none; } .home .state b + b { display: none; } }
 </style>
 </head>
@@ -900,9 +900,9 @@ $("#btnStop").addEventListener("click", () => stop());
     svg.appendChild(c);
   };
   // 안쪽은 촘촘하고 진하게, 바깥으로 갈수록 간격이 넓어지고 옅어짐
-  [66, 88, 120, 160, 210, 270, 340, 420, 510, 610, 720, 840, 970, 1110]
+  [88, 118, 155, 200, 255, 320, 395, 480, 575, 680, 795, 920, 1055, 1195]
     .forEach((r, i) => add(r, { "stroke-opacity": Math.max(0.18, 1 - i * 0.07).toFixed(2) }));
-  add(66, { class: "pulse" });
+  add(88, { class: "pulse" });
 })();
 function placeRings() {
   const f = $(".home .figure").getBoundingClientRect();
