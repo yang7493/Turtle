@@ -672,7 +672,7 @@ function notify() {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
   try {
     notice = new Notification("🐢 거북목!", {
-      body: "턱을 당기고 어깨를 펴세요.",
+      body: "턱을 당기고 어깨를 펴세요. 🚨🚨🚨",
       tag: "turtle-alarm", renotify: true, silent: $("#soundOn").checked, // 경고음은 앱이 직접 냄
     });
     notice.onclick = () => { window.focus(); notice.close(); };
