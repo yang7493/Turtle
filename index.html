@@ -638,10 +638,13 @@ function beep() {
   if (!$("#soundOn").checked || !audioCtx) return;
   if (audioCtx.state === "suspended") audioCtx.resume();
   const t = audioCtx.currentTime;
-  const len = 0.45; // 음 하나의 길이(초)
-  [[880, 0], [620, 0.5]].forEach(([f, dt]) => {
+  // "삐용~ 삐용~": 높은 음에서 낮은 음으로 미끄러지는 사이렌 소리를 두 번
+  const len = 0.45; // 삐용 한 번의 길이(초)
+  [0, 0.55].forEach((dt) => {
     const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type = "square"; o.frequency.value = f;
+    o.type = "square";
+    o.frequency.setValueAtTime(1400, t + dt);
+    o.frequency.exponentialRampToValueAtTime(600, t + dt + len);
     g.gain.setValueAtTime(0.0001, t + dt);
     g.gain.exponentialRampToValueAtTime(0.12, t + dt + 0.02);
     g.gain.setValueAtTime(0.12, t + dt + len - 0.06); // 끝나기 직전까지 크기 유지
