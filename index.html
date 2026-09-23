@@ -1031,8 +1031,8 @@ function prepareNoticeImages() {
   img.onload = () => {
     try {
       const font = '"IBM Plex Sans KR", "Malgun Gothic", sans-serif';
-      const rings = (g, cx, cy, radii) => {
-        g.strokeStyle = "#2A383F"; g.lineWidth = 1.5;
+      const rings = (g, cx, cy, radii, color = "#2A383F") => {
+        g.strokeStyle = color; g.lineWidth = 1.5;
         radii.forEach((r) => { g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke(); });
       };
       const tag = (g, x, y, size) => {
@@ -1047,14 +1047,14 @@ function prepareNoticeImages() {
       const c = document.createElement("canvas");
       c.width = 728; c.height = 364;
       const g = c.getContext("2d");
-      g.fillStyle = "#0C1013"; g.fillRect(0, 0, c.width, c.height);
-      rings(g, 150, 170, [100, 132, 168, 210]);
+      g.fillStyle = "#DE3A2C"; g.fillRect(0, 0, c.width, c.height);
+      rings(g, 150, 170, [100, 132, 168, 210], "rgba(0, 0, 0, .14)");
       g.drawImage(img, 20, 40, 260, 260);
       tag(g, 150, 318, 20);
       g.textAlign = "left"; g.textBaseline = "middle";
-      g.fillStyle = "#FF5A4D"; g.font = `700 104px ${font}`;
+      g.fillStyle = "#111111"; g.font = `700 104px ${font}`;
       g.fillText("거북목!", 318, 150);
-      g.fillStyle = "#E8EEF0"; g.font = `700 36px ${font}`;
+      g.fillStyle = "#FFFFFF"; g.font = `700 36px ${font}`;
       g.fillText("턱 당기고 어깨 펴기 🚨", 322, 248);
       noticeImage = c.toDataURL("image/png");
 
