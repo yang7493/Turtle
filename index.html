@@ -158,7 +158,19 @@
 
   .home .figure { position: relative; width: 176px; height: 176px; margin: 16px 0 4px; }
   .home .figure svg { width: 100%; height: 100%; overflow: visible; }
-  .home .figure .ring { fill: none; stroke: var(--h-line); }
+  /* 거북이를 중심으로 화면 끝까지 퍼지는 동심원 (스크롤 영역에 영향 없도록 fixed 레이어) */
+  .home .rings { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .home .rings svg {
+    position: absolute; left: var(--cx, 50%); top: var(--cy, 180px);
+    width: 2400px; height: 2400px; transform: translate(-50%, -50%); overflow: visible;
+  }
+  .home .rings circle { fill: none; stroke: #2A383F; stroke-width: 1; }
+  .home .rings .pulse {
+    stroke: var(--h-mint); stroke-opacity: .5; vector-effect: non-scaling-stroke;
+    transform-box: fill-box; transform-origin: center; animation: radar 5s ease-out infinite;
+  }
+  @keyframes radar { from { transform: scale(1); opacity: 1; } to { transform: scale(9); opacity: 0; } }
+  .home > :not(.rings) { position: relative; z-index: 1; }
   .home .figure .head { animation: stretch 6s ease-in-out infinite; }
   .home .state {
     position: absolute; left: 50%; bottom: 2px; transform: translateX(-50%);
@@ -194,17 +206,16 @@
   .home .go span { margin-right: 10px; font-size: .8em; }
   .home .need { margin: 14px 0 0; font-size: .74rem; letter-spacing: .12em; color: var(--h-dim); }
   .home .ver { margin-top: 40px; font: 500 .7rem/1 var(--mono); letter-spacing: .16em; color: var(--h-dim); }
-  @media (prefers-reduced-motion: reduce) { .home .head, .home .tag i, .home .state b { animation: none; } .home .state b + b { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .home .head, .home .tag i, .home .state b { animation: none; } .home .rings .pulse { display: none; } .home .state b + b { display: none; } }
 </style>
 </head>
 <body class="at-home">
 <main class="home" id="home">
+  <div class="rings" aria-hidden="true"><svg id="homeRings" viewBox="-1200 -1200 2400 2400"></svg></div>
   <div class="tag"><i></i>POSTURE MONITOR</div>
 
   <div class="figure" aria-hidden="true">
     <svg viewBox="0 0 176 176">
-      <circle class="ring" cx="88" cy="88" r="87" stroke-opacity=".6"/>
-      <circle class="ring" cx="88" cy="88" r="66"/>
       <g transform="translate(88 100) scale(1.2) translate(-88 -100)">
       <!-- 모니터 (옆모습) -->
       <g stroke="#3A4850" stroke-width="2" stroke-linecap="round">
@@ -879,9 +890,36 @@ $("#btnHome").addEventListener("click", () => {
 $("#btnMini").addEventListener("click", openMini);
 $("#btnStart").addEventListener("click", start);
 $("#btnStop").addEventListener("click", () => stop());
+// ---------- 홈 화면 동심원 ----------
+(function buildRings() {
+  const svg = $("#homeRings"), NS = "http://www.w3.org/2000/svg";
+  const add = (r, attrs = {}) => {
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("r", r);
+    for (const [k, v] of Object.entries(attrs)) c.setAttribute(k, v);
+    svg.appendChild(c);
+  };
+  // 안쪽은 촘촘하고 진하게, 바깥으로 갈수록 간격이 넓어지고 옅어짐
+  [66, 88, 120, 160, 210, 270, 340, 420, 510, 610, 720, 840, 970, 1110]
+    .forEach((r, i) => add(r, { "stroke-opacity": Math.max(0.18, 1 - i * 0.07).toFixed(2) }));
+  add(66, { class: "pulse" });
+})();
+function placeRings() {
+  const f = $(".home .figure").getBoundingClientRect();
+  if (!f.width) return; // 홈이 숨겨져 있을 때
+  const home = $("#home");
+  home.style.setProperty("--cx", f.left + f.width / 2 + "px");
+  home.style.setProperty("--cy", f.top + f.height / 2 + "px");
+}
+placeRings();
+document.fonts.ready.then(placeRings);
+window.addEventListener("resize", placeRings);
+$("#home").addEventListener("scroll", placeRings, { passive: true });
+
 $("#btnBack").addEventListener("click", () => {
   if (running) stop({ report: false }); // 홈으로 나가면 측정과 카메라를 끔
   document.body.classList.add("at-home");
+  placeRings();
   $("#btnHome").focus();
 });
 $("#btnCalib").addEventListener("click", beginCalibration);
