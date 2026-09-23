@@ -121,7 +121,7 @@
 
   /* ---------- 카메라 모니터링 영역 ---------- */
   .stage {
-    position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius-lg); overflow: hidden; isolation: isolate;
+    position: relative; aspect-ratio: 1 / 1; border-radius: var(--radius-lg); overflow: hidden; isolation: isolate;
     background: radial-gradient(120% 90% at 50% 30%, #25402F 0%, #1A2C22 55%, #131F19 100%);
   }
   .stage::after {
@@ -285,6 +285,19 @@
   dialog .row { display: flex; gap: 8px; margin-top: 24px; }
   dialog .row .btn { flex: 1; min-height: 46px; }
   #askSave h2 { font-size: 1.2rem; }
+
+  /* 저장된 기록 창 */
+  #historyDlg { width: min(560px, calc(100vw - 32px)); max-height: min(80vh, 720px); padding: 24px 24px 20px; }
+  #historyDlg[open] { display: flex; flex-direction: column; }
+  #historyDlg .sheet-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  #historyDlg .sheet-head h2 { margin-right: auto; }
+  #historyDlg ol { flex: 1; min-height: 0; max-height: none; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: var(--muted); transition: background-color var(--ease), color var(--ease); }
+  .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .icon-btn:focus-visible { outline: none; box-shadow: var(--ring); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .menu-count { padding: 3px 9px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-ink); font-size: .76rem; font-weight: 700; }
+  .menu-count:empty { display: none; }
 
   /* ---------- 좁은 화면 ---------- */
   @media (max-width: 980px) {
@@ -561,13 +574,13 @@
           </div>
         </div>
 
-        <div class="section dash-block history">
-          <div class="section-head">
-            <h2 class="card-title">저장된 기록</h2>
-            <button class="btn btn-text" id="btnClearHistory" hidden>모두 지우기</button>
-          </div>
-          <ol id="history"></ol>
-          <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
+        <div class="dash-block">
+          <button class="menu-row" id="btnHistory">
+            <span class="menu-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="10" height="12" rx="1.6"/><path d="M5.5 5.5h5M5.5 8h5M5.5 10.5h3"/></svg></span>
+            <span class="menu-label">저장된 기록</span>
+            <span class="menu-count" id="historyCount"></span>
+            <svg class="menu-chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5l4.5 4.5L6 12.5"/></svg>
+          </button>
         </div>
       </section>
     </aside>
@@ -585,6 +598,18 @@
     <button class="btn btn-primary" id="btnAgain">다시 측정하기</button>
     <button class="btn btn-secondary" id="btnClose">닫기</button>
   </div>
+</dialog>
+
+<dialog id="historyDlg" class="history">
+  <div class="sheet-head">
+    <h2 class="display">저장된 기록</h2>
+    <button class="btn btn-text" id="btnClearHistory" hidden>모두 지우기</button>
+    <button class="icon-btn" id="btnHistoryClose" aria-label="닫기" autofocus>
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15"/></svg>
+    </button>
+  </div>
+  <ol id="history"></ol>
+  <p class="empty" id="historyEmpty">아직 저장된 기록이 없어요.</p>
 </dialog>
 
 <dialog id="askSave">
@@ -1053,6 +1078,7 @@ function renderHistory() {
     return li;
   }));
   $("#historyEmpty").hidden = list.length > 0;
+  $("#historyCount").textContent = list.length ? `${list.length}개` : "";
   $("#btnClearHistory").hidden = list.length === 0;
 }
 renderHistory();
@@ -1072,6 +1098,12 @@ function runAfterReport() {
   const next = afterReport; afterReport = null;
   if (next) next();
 }
+$("#btnHistory").addEventListener("click", () => $("#historyDlg").showModal());
+$("#btnHistoryClose").addEventListener("click", () => $("#historyDlg").close());
+$("#historyDlg").addEventListener("click", (e) => { // 창 바깥(배경)을 누르면 닫기
+  const r = e.currentTarget.getBoundingClientRect();
+  if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.currentTarget.close();
+});
 $("#btnSave").addEventListener("click", () => $("#askSave").close("save"));
 $("#btnNoSave").addEventListener("click", () => $("#askSave").close());
 $("#btnClearHistory").addEventListener("click", () => {
