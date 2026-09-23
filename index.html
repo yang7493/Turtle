@@ -1,54 +1,618 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>거북목 경고등</title>
-<link rel="stylesheet" href="style.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐢</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gothic+A1:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --shell: #E4EEDD;
+    --paper: #F5F9F2;
+    --ink: #1C3A2E;
+    --muted: #587062;
+    --line: #C3D5C1;
+    --moss: #3F8A57;
+    --amber: #E29A1F;
+    --signal: #DE3A2C;
+    --idle: #9AAFA2;
+    --state: var(--idle);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --shell: #12211A; --paper: #1A2D24; --ink: #E4EEDD; --muted: #9DB5A7; --line: #2D463A; --idle: #5E7569;
+    }
+  }
+  :root[data-theme="dark"] {
+    --shell: #12211A; --paper: #1A2D24; --ink: #E4EEDD; --muted: #9DB5A7; --line: #2D463A; --idle: #5E7569;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; background: var(--shell); color: var(--ink);
+    font-family: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    font-size: 16px; line-height: 1.6;
+    transition: background-color .25s ease, color .25s ease;
+  }
+  body.alarm { background: var(--signal); color: #fff; --muted: #FFE1DC; --line: rgba(255,255,255,.35); }
+  .display { font-family: "Black Han Sans", "Gothic A1", sans-serif; font-weight: 400; letter-spacing: -0.01em; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 40px; }
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  header h1 { margin: 0; font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1; }
+  header p { margin: 6px 0 0; color: var(--muted); }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+  .stage {
+    position: relative; aspect-ratio: 4 / 3; background: #0E1A14; border-radius: 22px; overflow: hidden;
+    outline: 6px solid var(--state); outline-offset: -6px; transition: outline-color .2s;
+  }
+  .stage video, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  .stage-msg {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; padding: 24px; text-align: center; color: #EAF3E6; background: rgba(14, 26, 20, .72);
+  }
+  .stage-msg[hidden] { display: none; }
+  .stage-msg .big { font-size: clamp(3rem, 12vw, 6rem); line-height: 1; }
+  .stage-msg p { margin: 0; max-width: 34ch; }
+  .stage-msg small { color: #B7CBBE; max-width: 36ch; }
+  .hint { min-height: 1.6em; margin: 10px 4px 0; color: var(--muted); font-weight: 600; }
+
+  button, select {
+    font: inherit; font-weight: 800; border-radius: 999px; cursor: pointer;
+    border: 2px solid var(--ink); background: transparent; color: var(--ink); padding: 10px 18px;
+  }
+  button.primary { background: var(--moss); border-color: var(--moss); color: #fff; font-size: 1.1rem; padding: 14px 26px; }
+  button:disabled { opacity: .5; cursor: wait; }
+  button:focus-visible, select:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+  body.alarm button, body.alarm select { border-color: #fff; color: #fff; }
+
+  .panel { background: var(--paper); border-radius: 22px; padding: 22px; }
+  body.alarm .panel { background: rgba(255,255,255,.12); }
+  .reading { display: flex; align-items: center; gap: 18px; }
+  .lamp {
+    flex: none; width: 108px; height: 108px; border-radius: 50%; background: var(--state);
+    display: grid; place-items: center; font-size: 3rem;
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--state) 25%, transparent);
+    transition: background-color .2s, box-shadow .2s;
+  }
+  body.alarm .lamp { box-shadow: 0 0 0 8px rgba(255,255,255,.35); }
+  .reading .word { font-size: 2.3rem; line-height: 1.05; margin: 0; }
+  .reading .note { margin: 6px 0 0; color: var(--muted); }
+  .score { display: flex; align-items: baseline; gap: 8px; margin: 20px 0 4px; }
+  .score b { font-size: 4.2rem; line-height: 1; }
+  .score span { color: var(--muted); }
+  .meter { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 0%; background: var(--state); transition: width .2s, background-color .2s; }
+
+  dl.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; margin: 22px 0 0; }
+  dl.stats div { border-top: 2px solid var(--line); padding-top: 8px; }
+  dl.stats dt { font-size: .85rem; color: var(--muted); }
+  dl.stats dd { margin: 0; font-size: 1.6rem; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; align-items: center; }
+  .controls label { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: .95rem; }
+  .controls input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--moss); }
+
+  .timeline { margin-top: 20px; }
+  .timeline h2 { font-size: 1rem; margin: 0 0 8px; font-weight: 800; }
+  .timeline canvas { width: 100%; height: 36px; display: block; border-radius: 10px; background: var(--line); }
+  .legend { display: flex; gap: 16px; margin-top: 8px; font-size: .85rem; color: var(--muted); flex-wrap: wrap; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--c); }
+
+  .banner {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+    background: #fff; color: var(--signal); padding: 14px 26px; border-radius: 999px; font-size: 1.4rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25); display: none; white-space: nowrap;
+  }
+  body.alarm .banner { display: block; animation: nudge 1s ease-in-out infinite; }
+  @keyframes nudge { 50% { transform: translateX(-50%) translateY(-6px); } }
+  @media (prefers-reduced-motion: reduce) { body.alarm .banner { animation: none; } * { transition: none !important; } }
+
+  dialog { border: none; border-radius: 24px; padding: 28px; max-width: min(460px, 92vw); background: var(--paper); color: var(--ink); }
+  dialog::backdrop { background: rgba(10, 20, 15, .55); }
+  dialog h2 { margin: 0; font-size: 2.2rem; line-height: 1.1; }
+  dialog .grade { font-size: 4rem; line-height: 1; margin: 14px 0 4px; }
+  dialog p { margin: 6px 0; }
+  dialog .row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+</style>
 </head>
 <body>
-  <div id="app">
-    <header>
-      <h1>🐢 거북목 경고등</h1>
-      <p class="subtitle">웹캠으로 자세를 인식해서 목이 앞으로 빠지면 화면이 빨개집니다</p>
-    </header>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 class="display">거북목 경고등</h1>
+      <p>웹캠으로 자세를 보고, 목이 앞으로 빠지면 화면 전체가 빨갛게 켜집니다.</p>
+    </div>
+  </header>
 
-    <div id="stage">
-      <video id="video" autoplay playsinline muted></video>
-      <canvas id="overlay"></canvas>
-      <div id="warningLayer">
-        <div id="warningText">🐢 거북목 감지!</div>
+  <div class="grid">
+    <section>
+      <div class="stage" id="stage">
+        <video id="cam" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="stage-msg" id="stageMsg">
+          <div class="big" aria-hidden="true">🐢</div>
+          <p id="stageText">바르게 앉은 자세를 기준으로 저장한 뒤, 그보다 목이 앞으로 나오면 알려드려요.</p>
+          <button class="primary" id="btnStart">카메라 켜고 시작</button>
+          <small>영상은 이 브라우저 안에서만 분석되고 어디에도 전송되지 않아요.</small>
+        </div>
       </div>
-    </div>
+      <p class="hint" id="hint" aria-live="polite"></p>
+    </section>
 
-    <div id="controls">
-      <button id="startBtn">시작하기</button>
-      <button id="calibrateBtn" disabled>바른 자세로 보정하기</button>
-      <label class="sensitivity">
-        민감도
-        <input type="range" id="sensitivity" min="5" max="40" value="15" />
-      </label>
-    </div>
-
-    <div id="status">
-      <span id="statusDot" class="dot"></span>
-      <span id="statusLabel">대기 중</span>
-    </div>
-
-    <div id="statsPanel">
-      <div class="stat">
-        <div class="stat-label">오늘의 거북이 지수</div>
-        <div class="stat-value" id="todayCount">0</div>
-        <div class="stat-unit">회 감지</div>
+    <aside class="panel">
+      <div class="reading">
+        <div class="lamp" id="lamp" aria-hidden="true">🐢</div>
+        <div>
+          <p class="word display" id="word">대기 중</p>
+          <p class="note" id="note">시작하면 자세를 읽기 시작해요.</p>
+        </div>
       </div>
-      <div class="stat">
-        <div class="stat-label">오늘 거북목 유지 시간</div>
-        <div class="stat-value" id="todaySeconds">0</div>
-        <div class="stat-unit">초</div>
+
+      <div class="score"><b class="display" id="score">–</b><span>/ 100 자세 점수</span></div>
+      <div class="meter"><i id="meter"></i></div>
+
+      <dl class="stats">
+        <div><dt>측정 시간</dt><dd class="display" id="sTime">0:00</dd></div>
+        <div><dt>바른 자세 비율</dt><dd class="display" id="sGood">–</dd></div>
+        <div><dt>경고 횟수</dt><dd class="display" id="sAlarms">0</dd></div>
+        <div><dt>최장 연속 바른 자세</dt><dd class="display" id="sStreak">0:00</dd></div>
+      </dl>
+
+      <div class="controls">
+        <button id="btnCalib" disabled>기준 자세 다시 잡기</button>
+        <button id="btnStop" disabled>끝내고 결과 보기</button>
+        <button id="btnMini" disabled>작은 창으로 띄우기</button>
       </div>
-      <button id="resetBtn">오늘 기록 초기화</button>
-    </div>
+      <div class="controls">
+        <label>민감도
+          <select id="sens">
+            <option value="0.26">느슨하게</option>
+            <option value="0.18" selected>보통</option>
+            <option value="0.11">예민하게</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="soundOn" checked> 경고음</label>
+        <label><input type="checkbox" id="notifyOn"> 다른 창에서도 알림</label>
+      </div>
+
+      <div class="timeline">
+        <h2>자세 기록</h2>
+        <canvas id="tl"></canvas>
+        <div class="legend">
+          <span style="--c: var(--moss)">바른 목</span>
+          <span style="--c: var(--amber)">슬슬 거북</span>
+          <span style="--c: var(--signal)">거북목</span>
+          <span style="--c: var(--idle)">인식 안 됨</span>
+        </div>
+      </div>
+    </aside>
   </div>
+</div>
 
-  <script type="module" src="script.js"></script>
+<div class="banner display" role="alert">🐢 턱을 당기고 어깨를 펴세요</div>
+
+<dialog id="report">
+  <h2 class="display">오늘의 거북이 지수</h2>
+  <div class="grade display" id="rGrade"></div>
+  <p id="rLabel"></p>
+  <p id="rDetail" style="color: var(--muted)"></p>
+  <div class="row">
+    <button class="primary" id="btnAgain">다시 측정하기</button>
+    <button id="btnClose">닫기</button>
+  </div>
+</dialog>
+
+<script type="module">
+import { PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+
+const WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+const MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
+
+const $ = (s) => document.querySelector(s);
+const video = $("#cam"), canvas = $("#overlay"), ctx = canvas.getContext("2d");
+const root = document.documentElement;
+
+const STATES = {
+  none: { word: "인식 중", note: "어깨와 귀가 화면에 보이게 앉아주세요.", cssVar: "--idle", emoji: "👀" },
+  good: { word: "바른 목", note: "지금 자세 아주 좋아요.", cssVar: "--moss", emoji: "🧍" },
+  warn: { word: "슬슬 거북", note: "고개가 조금씩 앞으로 나오고 있어요.", cssVar: "--amber", emoji: "😬" },
+  bad:  { word: "거북목!", note: "턱을 당기고 어깨를 펴세요.", cssVar: "--signal", emoji: "🐢" },
+};
+
+let landmarker = null, stream = null, running = false, lastVideoTime = -1;
+let mode = "idle";            // idle | calibrating | watching | stopped
+let base = null;              // { neck, close }
+let calib = null;             // { samples, until }
+let ema = null, current = "none";
+let badSince = null, alarmOn = false, alarmTimer = null, titleTimer = null;
+let audioCtx = null, tickTimer = null;
+let pipWin = null; // Document Picture-in-Picture 작은 창
+let stats = freshStats();
+
+function freshStats() {
+  return { ticks: [], good: 0, warn: 0, bad: 0, alarms: 0, streak: 0, best: 0 };
+}
+
+// ---------- preferences ----------
+try {
+  const saved = JSON.parse(localStorage.getItem("turtle-prefs") || "{}");
+  if (saved.sens) $("#sens").value = saved.sens;
+  if (typeof saved.sound === "boolean") $("#soundOn").checked = saved.sound;
+} catch {}
+function savePrefs() {
+  try { localStorage.setItem("turtle-prefs", JSON.stringify({ sens: $("#sens").value, sound: $("#soundOn").checked })); } catch {}
+}
+$("#sens").addEventListener("change", savePrefs);
+$("#soundOn").addEventListener("change", savePrefs);
+$("#notifyOn").addEventListener("change", async (e) => {
+  if (!e.target.checked || !("Notification" in window)) return;
+  const p = await Notification.requestPermission();
+  if (p !== "granted") { e.target.checked = false; hint("브라우저 알림이 차단되어 있어요. 주소창 옆 설정에서 허용할 수 있어요."); }
+});
+
+// ---------- UI helpers ----------
+function hint(t) { $("#hint").textContent = t || ""; }
+function stageMsg(text, { showButton = false } = {}) {
+  $("#stageMsg").hidden = !text;
+  if (text) $("#stageText").textContent = text;
+  $("#btnStart").hidden = !showButton;
+}
+function setState(key, score) {
+  const s = STATES[key];
+  root.style.setProperty("--state", `var(${s.cssVar})`);
+  $("#word").textContent = s.word;
+  $("#note").textContent = s.note;
+  $("#lamp").textContent = s.emoji;
+  $("#score").textContent = score == null ? "–" : Math.round(score);
+  $("#meter").style.width = (score == null ? 0 : score) + "%";
+  if (pipWin && !pipWin.closed) {
+    const d = pipWin.document;
+    d.documentElement.style.setProperty("--state", `var(${s.cssVar})`);
+    d.getElementById("mLamp").textContent = s.emoji;
+    d.getElementById("mWord").textContent = $("#word").textContent;
+    d.getElementById("mScore").textContent = score == null ? "–" : Math.round(score);
+  }
+}
+const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
+
+// ---------- camera + model ----------
+async function createLandmarker() {
+  const fileset = await FilesetResolver.forVisionTasks(WASM);
+  const opts = (delegate) => ({ baseOptions: { modelAssetPath: MODEL, delegate }, runningMode: "VIDEO", numPoses: 1 });
+  try { return await PoseLandmarker.createFromOptions(fileset, opts("GPU")); }
+  catch { return await PoseLandmarker.createFromOptions(fileset, opts("CPU")); }
+}
+
+async function start() {
+  $("#btnStart").disabled = true;
+  stageMsg("카메라와 자세 인식 모델을 준비하는 중이에요…");
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }, audio: false });
+    video.srcObject = stream;
+    await video.play();
+    if (!landmarker) landmarker = await createLandmarker();
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    stats = freshStats();
+    running = true;
+    $("#btnCalib").disabled = false;
+    $("#btnStop").disabled = false;
+    $("#btnMini").disabled = !("documentPictureInPicture" in window);
+    beginCalibration();
+    clearInterval(tickTimer);
+    tickTimer = setInterval(tick, 1000);
+    schedule();
+  } catch (e) {
+    const denied = e && (e.name === "NotAllowedError" || e.name === "SecurityError");
+    stageMsg(denied
+      ? "카메라 권한이 막혀 있어요. 주소창의 카메라 아이콘에서 허용한 뒤 다시 시작하세요."
+      : "카메라나 모델을 불러오지 못했어요. 인터넷 연결과 다른 앱의 카메라 사용 여부를 확인한 뒤 다시 시작하세요.", { showButton: true });
+    console.error(e);
+  } finally {
+    $("#btnStart").disabled = false;
+  }
+}
+
+function stop() {
+  running = false;
+  clearInterval(tickTimer);
+  clearAlarm();
+  if (stream) stream.getTracks().forEach((t) => t.stop());
+  stream = null;
+  mode = "stopped";
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  setState("none", null);
+  $("#word").textContent = "측정 끝";
+  $("#note").textContent = "결과를 확인해 보세요.";
+  $("#btnCalib").disabled = true;
+  $("#btnStop").disabled = true;
+  $("#btnMini").disabled = true;
+  if (pipWin && !pipWin.closed) pipWin.close();
+  stageMsg("측정을 마쳤어요. 다시 하려면 카메라를 켜세요.", { showButton: true });
+  showReport();
+}
+
+function beginCalibration() {
+  base = null; ema = null; badSince = null;
+  clearAlarm();
+  calib = { samples: [], until: performance.now() + 3000 };
+  mode = "calibrating";
+  setState("none", null);
+  $("#word").textContent = "기준 잡는 중";
+  $("#note").textContent = "허리를 펴고 화면을 정면으로 보세요.";
+}
+
+// ---------- detection loop ----------
+function schedule() {
+  if (!running) return;
+  if (pipWin && !pipWin.closed) pipWin.requestAnimationFrame(loop); // 작은 창은 항상 보이므로 느려지지 않음
+  else if (document.hidden) setTimeout(loop, 250);                   // 탭이 가려지면 브라우저가 속도를 제한함
+  else requestAnimationFrame(loop);
+}
+function loop() {
+  if (!running) return;
+  if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
+    lastVideoTime = video.currentTime;
+    const now = performance.now();
+    const res = landmarker.detectForVideo(video, now);
+    handle(res, now);
+  }
+  schedule();
+}
+
+function measure(L, w, h) {
+  const ls = L[11], rs = L[12], le = L[7], re = L[8];
+  if (Math.min(ls.visibility ?? 1, rs.visibility ?? 1) < 0.5) return null;
+  if (Math.min(le.visibility ?? 1, re.visibility ?? 1) < 0.2) return null;
+  const P = (p) => ({ x: p.x * w, y: p.y * h });
+  const a = P(ls), b = P(rs), c = P(le), d = P(re);
+  const sw = Math.hypot(a.x - b.x, a.y - b.y);
+  if (sw < 20) return null;
+  const sm = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  const em = { x: (c.x + d.x) / 2, y: (c.y + d.y) / 2 };
+  return {
+    neck: (sm.y - em.y) / sw,                       // 귀가 어깨보다 얼마나 위에 있나 (작아지면 목이 앞으로/아래로)
+    close: Math.hypot(c.x - d.x, c.y - d.y) / sw,  // 머리가 어깨보다 화면에 얼마나 가까운가 (커지면 앞으로)
+    a, b, c, d, sm, em, sw,
+  };
+}
+
+const median = (arr) => { const s = [...arr].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
+
+function handle(res, now) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const L = res && res.landmarks && res.landmarks[0];
+  const m = L ? measure(L, canvas.width, canvas.height) : null;
+
+  if (mode === "calibrating") {
+    const left = Math.max(0, Math.ceil((calib.until - now) / 1000));
+    if (m) { calib.samples.push(m); draw(m, "good"); }
+    stageMsg(left > 0 ? `바른 자세로 ${left}초만 가만히 있어주세요` : "기준 저장 중…");
+    if (now >= calib.until) {
+      if (calib.samples.length < 8) {
+        hint("어깨와 귀가 잘 보이지 않아요. 카메라에서 조금 떨어져 상체가 나오게 앉아주세요.");
+        calib = { samples: [], until: now + 3000 };
+        return;
+      }
+      base = { neck: median(calib.samples.map((s) => s.neck)), close: median(calib.samples.map((s) => s.close)) };
+      mode = "watching";
+      stageMsg(null);
+      hint("기준 자세를 저장했어요. 이제 편하게 작업하세요.");
+    }
+    return;
+  }
+
+  if (mode !== "watching") return;
+  if (!m) { current = "none"; setState("none", ema); hint("어깨와 귀가 화면에 보이게 앉아주세요."); return; }
+  hint("");
+
+  const sens = parseFloat($("#sens").value);
+  const drop = Math.max(0, 1 - m.neck / base.neck);
+  const lean = Math.max(0, m.close / base.close - 1);
+  const deviation = drop + lean * 0.6;
+  const raw = Math.max(0, Math.min(100, 100 - (deviation / sens) * 50));
+  ema = ema == null ? raw : ema * 0.8 + raw * 0.2;
+
+  const st = ema >= 70 ? "good" : ema >= 45 ? "warn" : "bad";
+  current = st;
+  setState(st, ema);
+  draw(m, st);
+
+  if (st === "bad") {
+    if (badSince == null) badSince = now;
+    if (!alarmOn && now - badSince >= 3000) triggerAlarm();
+  } else {
+    badSince = null;
+    if (alarmOn && st === "good") clearAlarm();
+  }
+}
+
+function draw(m, st) {
+  const color = getComputedStyle(root).getPropertyValue(STATES[st].cssVar).trim() || "#3F8A57";
+  const r = m.sw * 0.16;
+  ctx.lineCap = "round";
+
+  // 기준 머리 위치 (점선 원)
+  if (base) {
+    const gx = m.sm.x, gy = m.sm.y - base.neck * m.sw;
+    ctx.setLineDash([8, 8]);
+    ctx.strokeStyle = "rgba(255,255,255,.75)";
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(gx, gy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  // 어깨선
+  ctx.strokeStyle = color; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.moveTo(m.a.x, m.a.y); ctx.lineTo(m.b.x, m.b.y); ctx.stroke();
+  // 목선
+  ctx.beginPath(); ctx.moveTo(m.sm.x, m.sm.y); ctx.lineTo(m.em.x, m.em.y); ctx.stroke();
+  // 현재 머리 위치
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.35;
+  ctx.beginPath(); ctx.arc(m.em.x, m.em.y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(m.em.x, m.em.y, r, 0, Math.PI * 2); ctx.stroke();
+  [m.a, m.b, m.c, m.d].forEach((p) => { ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.fill(); });
+}
+
+// ---------- alarm ----------
+function beep() {
+  if (!$("#soundOn").checked || !audioCtx) return;
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  const t = audioCtx.currentTime;
+  [[880, 0], [620, 0.16]].forEach(([f, dt]) => {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = "square"; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t + dt);
+    g.gain.exponentialRampToValueAtTime(0.12, t + dt + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.14);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(t + dt); o.stop(t + dt + 0.15);
+  });
+}
+function triggerAlarm() {
+  alarmOn = true;
+  stats.alarms++;
+  document.body.classList.add("alarm");
+  if (pipWin && !pipWin.closed) pipWin.document.body.classList.add("alarm");
+  beep();
+  alarmTimer = setInterval(beep, 6000);
+  let flip = false;
+  titleTimer = setInterval(() => { document.title = (flip = !flip) ? "🐢 거북목!" : "목을 뒤로!"; }, 800);
+  if (document.hidden && $("#notifyOn").checked && "Notification" in window && Notification.permission === "granted") {
+    try { new Notification("🐢 거북목 경보", { body: "턱을 당기고 어깨를 펴세요." }); } catch {}
+  }
+  updateStats();
+}
+function clearAlarm() {
+  alarmOn = false;
+  document.body.classList.remove("alarm");
+  if (pipWin && !pipWin.closed) pipWin.document.body.classList.remove("alarm");
+  clearInterval(alarmTimer); clearInterval(titleTimer);
+  document.title = "거북목 경고등";
+}
+
+// ---------- stats + timeline ----------
+function tick() {
+  if (mode !== "watching") return;
+  const st = current;
+  stats.ticks.push(st);
+  if (st !== "none") stats[st]++;
+  if (st === "good") { stats.streak++; stats.best = Math.max(stats.best, stats.streak); }
+  else stats.streak = 0;
+  updateStats();
+  drawTimeline();
+}
+function updateStats() {
+  const counted = stats.good + stats.warn + stats.bad;
+  $("#sTime").textContent = fmt(stats.ticks.length);
+  $("#sGood").textContent = counted ? Math.round((stats.good / counted) * 100) + "%" : "–";
+  $("#sAlarms").textContent = stats.alarms;
+  $("#sStreak").textContent = fmt(stats.best);
+}
+function drawTimeline() {
+  const c = $("#tl"), dpr = window.devicePixelRatio || 1;
+  const W = c.clientWidth, H = c.clientHeight;
+  c.width = W * dpr; c.height = H * dpr;
+  const g = c.getContext("2d");
+  g.scale(dpr, dpr);
+  g.clearRect(0, 0, W, H);
+  const n = stats.ticks.length;
+  if (!n) return;
+  const cs = getComputedStyle(root);
+  const bw = Math.min(8, W / n);
+  stats.ticks.forEach((st, i) => {
+    g.fillStyle = cs.getPropertyValue(STATES[st].cssVar).trim();
+    g.fillRect(i * bw, 0, Math.ceil(bw), H);
+  });
+}
+window.addEventListener("resize", drawTimeline);
+
+// ---------- report ----------
+function showReport() {
+  const counted = stats.good + stats.warn + stats.bad;
+  const idx = counted ? Math.round(((stats.bad + stats.warn * 0.5) / counted) * 100) : 0;
+  const [emoji, label] = idx < 15 ? ["🧍", "아직 사람이에요. 이 자세 그대로 유지하세요."]
+    : idx < 35 ? ["🙇", "반쯤 거북이에요. 한 시간에 한 번은 기지개를 켜세요."]
+    : ["🐢", "완전 거북이에요. 모니터를 눈높이까지 올려보세요."];
+  $("#rGrade").textContent = `${emoji} ${idx}`;
+  $("#rLabel").textContent = label;
+  $("#rDetail").textContent = `측정 ${fmt(stats.ticks.length)} 동안 경고 ${stats.alarms}번, 최장 연속 바른 자세 ${fmt(stats.best)}.`;
+  $("#report").showModal();
+}
+
+// ---------- 작은 창 (Document Picture-in-Picture) ----------
+async function openMini() {
+  if (!("documentPictureInPicture" in window)) {
+    hint("이 브라우저는 작은 창을 지원하지 않아요. 데스크톱 Chrome이나 Edge 최신 버전에서 사용하세요.");
+    return;
+  }
+  if (pipWin && !pipWin.closed) { pipWin.focus(); return; }
+  pipWin = await documentPictureInPicture.requestWindow({ width: 240, height: 330 });
+  const d = pipWin.document;
+  d.title = "거북목 경고등";
+
+  // 본문 스타일 복사 (외부 폰트 시트는 link로 다시 연결)
+  [...document.styleSheets].forEach((ss) => {
+    try {
+      const st = d.createElement("style");
+      st.textContent = [...ss.cssRules].map((r) => r.cssText).join("\n");
+      d.head.appendChild(st);
+    } catch {
+      if (ss.href) { const l = d.createElement("link"); l.rel = "stylesheet"; l.href = ss.href; d.head.appendChild(l); }
+    }
+  });
+  const st = d.createElement("style");
+  st.textContent = `
+    body { margin: 0; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+    .mini-cam { width: 100%; aspect-ratio: 4/3; object-fit: cover; transform: scaleX(-1); border-radius: 14px;
+      background: #0E1A14; outline: 4px solid var(--state); outline-offset: -4px; }
+    .mini-row { display: flex; align-items: center; gap: 12px; }
+    .mini-row .lamp { width: 64px; height: 64px; font-size: 1.9rem; box-shadow: 0 0 0 5px color-mix(in srgb, var(--state) 25%, transparent); }
+    #mWord { font-size: 1.5rem; line-height: 1.1; margin: 0; }
+    #mScore { font-size: 2.4rem; line-height: 1; }
+    small { color: var(--muted); }`;
+  d.head.appendChild(st);
+  d.body.innerHTML = `
+    <div class="mini-row">
+      <div class="lamp" id="mLamp">🐢</div>
+      <div><p class="display" id="mWord">인식 중</p><b class="display" id="mScore">–</b></div>
+    </div>
+    <small>이 창을 닫으면 원래 화면으로 돌아가요.</small>`;
+
+  // 카메라 영상을 작은 창으로 옮겨서, 본 탭이 가려져도 프레임이 계속 들어오게 함
+  video.classList.add("mini-cam");
+  d.body.prepend(video);
+  video.play().catch(() => {});
+  if (document.body.classList.contains("alarm")) d.body.classList.add("alarm");
+  setState(current, ema);
+
+  pipWin.addEventListener("pagehide", () => {
+    video.classList.remove("mini-cam");
+    $("#stage").prepend(video);
+    video.play().catch(() => {});
+    pipWin = null;
+  });
+}
+
+$("#btnMini").addEventListener("click", openMini);
+$("#btnStart").addEventListener("click", start);
+$("#btnStop").addEventListener("click", stop);
+$("#btnCalib").addEventListener("click", beginCalibration);
+$("#btnClose").addEventListener("click", () => $("#report").close());
+$("#btnAgain").addEventListener("click", () => { $("#report").close(); start(); });
+</script>
 </body>
 </html>
