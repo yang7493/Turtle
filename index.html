@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐢</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gothic+A1:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --shell: #FFFFFF;
@@ -30,12 +30,12 @@
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   body {
     margin: 0; background: var(--shell); color: var(--ink);
-    font-family: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
     font-size: 16px; line-height: 1.6;
     transition: background-color .25s ease, color .25s ease;
   }
   body.alarm { background: var(--signal); color: #fff; --muted: #FFE1DC; --line: rgba(255,255,255,.35); }
-  .display { font-family: "Black Han Sans", "Gothic A1", sans-serif; font-weight: 400; letter-spacing: -0.01em; }
+  .display { font-weight: 700; letter-spacing: -0.01em; }
 
   .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 40px; }
   header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -62,7 +62,7 @@
   .hint { min-height: 1.6em; margin: 10px 4px 0; color: var(--muted); font-weight: 600; }
 
   button, select {
-    font: inherit; font-weight: 800; border-radius: 0; cursor: pointer;
+    font: inherit; font-weight: 700; border-radius: 0; cursor: pointer;
     border: 2px solid var(--ink); background: transparent; color: var(--ink); padding: 10px 18px;
   }
   button.primary { background: var(--moss); border-color: var(--moss); color: #fff; font-size: 1.1rem; padding: 14px 26px; }
@@ -98,7 +98,7 @@
   .controls input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--moss); }
 
   .timeline { margin-top: 20px; }
-  .timeline h2 { font-size: 1rem; margin: 0 0 8px; font-weight: 800; }
+  .timeline h2 { font-size: 1rem; margin: 0 0 8px; font-weight: 700; }
   .timeline canvas { width: 100%; height: 36px; display: block; background: var(--line); }
   .legend { display: flex; gap: 16px; margin-top: 8px; font-size: .85rem; color: var(--muted); flex-wrap: wrap; }
   .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--c); }
@@ -122,11 +122,11 @@
 
   .history { margin-top: 22px; }
   .history-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-  .history h2 { font-size: 1rem; margin: 0; font-weight: 800; }
+  .history h2 { font-size: 1rem; margin: 0; font-weight: 700; }
   .history-head button { padding: 4px 12px; font-size: .8rem; border-width: 1.5px; }
   .history ol { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; }
   .history li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: .9rem; }
-  .history li b { font-weight: 800; white-space: nowrap; }
+  .history li b { font-weight: 700; white-space: nowrap; }
   .history li span { color: var(--muted); text-align: right; }
   .history .empty { margin: 0; color: var(--muted); font-size: .9rem; }
 
@@ -134,7 +134,7 @@
   .home {
     --h-bg: #0C1013; --h-ink: #E8EEF0; --h-muted: #8A969C; --h-dim: #4D585E;
     --h-line: #243036; --h-chip: #141B20; --h-mint: #6FD3A8; --h-mint-ink: #0B1A13; --h-amber: #F0A04B;
-    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+    --mono: "IBM Plex Sans KR", "Malgun Gothic", sans-serif;
     position: fixed; inset: 0; z-index: 10; overflow-y: auto; color-scheme: dark;
     display: flex; flex-direction: column; align-items: center; justify-content: safe center;
     padding: 20px 16px; text-align: center; color: var(--h-ink);
@@ -172,7 +172,7 @@
   /* 가끔 거북이 목이 모니터 쪽으로 쭉 빠졌다가 돌아오는 모습 */
   @keyframes stretch { 0%, 55%, 100% { transform: none; } 70%, 85% { transform: translate(12px, 5px); } }
 
-  .home h1 { margin: 16px 0 0; font-size: clamp(1.7rem, 5vw, 2.1rem); line-height: 1.15; font-weight: 800; letter-spacing: -.01em; }
+  .home h1 { margin: 16px 0 0; font-size: clamp(1.7rem, 5vw, 2.1rem); line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
   .home .sub { margin: 10px 0 0; font: 500 .72rem/1 var(--mono); letter-spacing: .22em; color: var(--h-dim); }
   .home .lead { margin: 22px 0 0; color: var(--h-muted); line-height: 1.75; font-size: .98rem; }
 
@@ -186,7 +186,7 @@
 
   .home .go {
     margin-top: 30px; width: min(236px, 100%); padding: 14px 20px; border: none; border-radius: 0;
-    background: var(--h-mint); color: var(--h-mint-ink); font: 800 1rem/1 "Gothic A1", sans-serif; letter-spacing: .2em;
+    background: var(--h-mint); color: var(--h-mint-ink); font: 700 1rem/1 "IBM Plex Sans KR", "Malgun Gothic", sans-serif; letter-spacing: .2em;
     box-shadow: 0 0 28px rgba(111, 211, 168, .25); transition: transform .15s, box-shadow .15s;
   }
   .home .go:hover { transform: translateY(-1px); box-shadow: 0 0 38px rgba(111, 211, 168, .4); }
@@ -677,10 +677,10 @@ function getNoticeImage() {
     const g = c.getContext("2d");
     g.fillStyle = "#DE3A2C"; g.fillRect(0, 0, c.width, c.height);
     g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle";
-    const font = '"Black Han Sans", "Malgun Gothic", sans-serif';
-    g.font = `140px ${font}`;
+    const font = '"IBM Plex Sans KR", "Malgun Gothic", sans-serif';
+    g.font = `700 140px ${font}`;
     g.fillText("🐢 거북목!", c.width / 2, 140);
-    g.font = `bold 52px ${font}`;
+    g.font = `700 52px ${font}`;
     g.fillText("턱 당기고 어깨 펴기 🚨", c.width / 2, 275);
     noticeImage = c.toDataURL("image/png");
   } catch {}
