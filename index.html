@@ -666,6 +666,26 @@ function triggerAlarm() {
   noticeTimer = setInterval(notify, 20000); // 자세를 고칠 때까지 20초마다 다시 알림
   updateStats();
 }
+// 시스템 알림 글씨 크기는 OS가 정하므로, 큰 글씨를 그림으로 그려 알림 이미지로 붙임
+// (이미지를 지원하지 않는 환경에서는 무시되고 글자 알림만 뜸)
+let noticeImage = null;
+function getNoticeImage() {
+  if (noticeImage) return noticeImage;
+  try {
+    const c = document.createElement("canvas");
+    c.width = 728; c.height = 364;
+    const g = c.getContext("2d");
+    g.fillStyle = "#DE3A2C"; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle";
+    const font = '"Black Han Sans", "Malgun Gothic", sans-serif';
+    g.font = `140px ${font}`;
+    g.fillText("🐢 거북목!", c.width / 2, 140);
+    g.font = `bold 52px ${font}`;
+    g.fillText("턱 당기고 어깨 펴기 🚨", c.width / 2, 275);
+    noticeImage = c.toDataURL("image/png");
+  } catch {}
+  return noticeImage;
+}
 // 다른 창에서 일하는 중(이 창에 포커스가 없음)이면 화면 구석에 시스템 알림을 띄움
 function notify() {
   if (document.hasFocus() || !$("#notifyOn").checked) return;
@@ -673,6 +693,7 @@ function notify() {
   try {
     notice = new Notification("🐢 거북목!", {
       body: "턱을 당기고 어깨를 펴세요. 🚨🚨🚨",
+      image: getNoticeImage() || undefined,
       tag: "turtle-alarm", renotify: true, silent: $("#soundOn").checked, // 경고음은 앱이 직접 냄
     });
     notice.onclick = () => { window.focus(); notice.close(); };
